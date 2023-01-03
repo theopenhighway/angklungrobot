@@ -7,9 +7,11 @@ mid = MidiFile(directo + 'scale_c_major.mid')
 for i, track in enumerate(mid.tracks):
     print('Track {}: {}'.format(i, track.name))
     for msg in track:
-        #ignore metadata
+        #ignores metadata
         if not msg.is_meta:
             note_num = msg.note
+
+            #if note_on, then display output
             if msg.type == 'note_on':
                 #print(msg.note)
                 match note_num:
@@ -117,5 +119,5 @@ for i, track in enumerate(mid.tracks):
                     case 72:
                         print('C5 off')
 
-        
+
   
