@@ -1,5 +1,6 @@
 from mido import MidiFile
 from mido import Message
+# import pretty_midi
 
 directo = '/home/milo17/Documents/angklungrobot/midi_files/'
 mid = MidiFile(directo + 'scale_c_major.mid')
