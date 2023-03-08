@@ -7,6 +7,9 @@ import serial
 # import spidev
 # from lib_nrf24 import NRF24
 
+ser = serial.Serial('/dev/ttACM0',9600)
+ser.flush()
+
 intr = rtmidi.MidiIn()
 ports = intr.get_ports()
 # print(ports)
@@ -19,8 +22,9 @@ while True:
         (msg, dt) = msgde
         command = hex(msg[0])
         notes = msg[1]
+        velocity = msg[2]
 
-        # get motor ref number
+        # get motor ref numbergpio 
         if notes >= 72:
             motorNO = ((notes % 12) + 24) + 1
         elif notes >= 60:
@@ -29,8 +33,11 @@ while True:
             motorNO = (notes % 12)  + 1
 
         if command == '0x90':
+            ser.write(str(motorNO).encode('ascii'))
             print(f"{command} {msg[1:]}\t| dt = {dt:.2f}")
         elif command == '0x80':
+            ser.write(str(motorNO).encode('ascii'))
+            ser.write(int(dt))
             print(f"{command} {msg[1:]}\t| dt = {dt:.2f}")
         # print(msgde)
     else:

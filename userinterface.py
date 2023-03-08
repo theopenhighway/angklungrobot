@@ -6,10 +6,6 @@ from tkinter.filedialog import askopenfilename
 
 
 
-
-while True:
-    ser.write()
-
 def main():
     ser = serial.Serial('/dev/ttACM0',9600)
     ser.flush()
@@ -25,3 +21,4 @@ def main():
     
 if __name__ == '__main__':
     main()
+    
