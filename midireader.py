@@ -6,14 +6,14 @@ directo = '/home/milo17/Documents/angklungrobot/midi_files/'
 mid = MidiFile(directo + 'scale_c_major.mid')
 
 for i, track in enumerate(mid.tracks):
-    print('Track {}: {}'.format(i, track.name))
+    #print('Track {}: {}'.format(i, track.name))
     for msg in track:
         #ignores metadata
         if not msg.is_meta:
             note_num = msg.note
 
             # get motor ref number
-            if note_num < 60:
+            if note_num < 48:
                 pass
             else:
                 if note_num >= 72:
