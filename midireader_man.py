@@ -7,8 +7,8 @@ import serial
 # import spidev
 # from lib_nrf24 import NRF24
 
-ser = serial.Serial('/dev/ttACM0',9600)
-ser.flush()
+#ser = serial.Serial('/dev/ttACM0',9600)
+#ser.flush()
 
 intr = rtmidi.MidiIn()
 ports = intr.get_ports()
@@ -32,13 +32,18 @@ while True:
         else:
             motorNO = (notes % 12)  + 1
 
+        motorNOstr = str(motorNO) + '\n'
         if command == '0x90':
-            ser.write(str(motorNO).encode('ascii'))
-            print(f"{command} {msg[1:]}\t| dt = {dt:.2f}")
+            #ser.write("on \n")
+            #ser.write(motorNOstr.encode('ascii'))
+            print(motorNOstr)
+            #print(f"{command} {msg[1:]}\t| dt = {dt:.2f}")
         elif command == '0x80':
-            ser.write(str(motorNO).encode('ascii'))
-            ser.write(int(dt))
-            print(f"{command} {msg[1:]}\t| dt = {dt:.2f}")
+            #ser.write("off \n")
+            #ser.write(motorNOstr.encode('ascii'))
+            print(motorNOstr)
+            #ser.write(int(dt))
+            #print(f"{command} {msg[1:]}\t| dt = {dt:.2f}")
         # print(msgde)
     else:
         time.sleep(0.001)
