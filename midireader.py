@@ -13,16 +13,19 @@ for i, track in enumerate(mid.tracks):
             note_num = msg.note
 
             # get motor ref number
-            if note_num >= 72:
-                motorNO = ((note_num % 12) + 24) + 1
-            elif note_num >= 60:
-                motorNO = ((note_num % 12) + 12) + 1
+            if note_num < 60:
+                pass
             else:
-                motorNO = (note_num % 12)  + 1
-                
-            #if note_on, then display output
-            if msg.type == 'note_on':
-                print(msg.note)
+                if note_num >= 72:
+                    motorNO = ((note_num % 12) + 24) + 1
+                elif note_num >= 60:
+                    motorNO = ((note_num % 12) + 12) + 1
+                else:
+                    motorNO = (note_num % 12)  + 1
+                    
+                #if note_on, then display output
+                if msg.type == 'note_on':
+                    print(msg.note)
 
 
 def runmotor(channel, note, velocity):
