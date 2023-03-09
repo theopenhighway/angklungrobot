@@ -21,9 +21,10 @@ while True:
     if msgde:
         (msg, dt) = msgde
         command = hex(msg[0])
+        notestat = msg[0]
         notes = msg[1]
         velocity = msg[2]
-
+        
         # get motor ref numbergpio 
         if notes >= 72:
             motorNO = ((notes % 12) + 24) + 1
@@ -32,16 +33,19 @@ while True:
         else:
             motorNO = (notes % 12)  + 1
 
-        motorNOstr = str(motorNO) + '\n'
+        listmes = [notestat, motorNO, velocity, int(dt * 1000)]
+        listmes = bytes(listmes)
+
+        # motorNOstr = str(motorNO) + '\n'
         if command == '0x90':
             #ser.write("on \n")
             #ser.write(motorNOstr.encode('ascii'))
-            print(motorNOstr)
+            print(listmes)
             #print(f"{command} {msg[1:]}\t| dt = {dt:.2f}")
         elif command == '0x80':
             #ser.write("off \n")
             #ser.write(motorNOstr.encode('ascii'))
-            print(motorNOstr)
+            print(motorNO)
             #ser.write(int(dt))
             #print(f"{command} {msg[1:]}\t| dt = {dt:.2f}")
         # print(msgde)
