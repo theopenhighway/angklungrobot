@@ -5,6 +5,7 @@ from time import sleep
 # from PIL import ImageTk
 from tkinter.filedialog import askopenfilename
 
+# https://www.geeksforgeeks.org/tkinter-application-to-switch-between-different-page-frames/
 TITLEFONT = ("calibri", 30)
 CAPTIONFONT = ()
 BUTTONFONT = ()
