@@ -6,6 +6,8 @@ from time import sleep
 from tkinter.filedialog import askopenfilename
 
 # https://www.geeksforgeeks.org/tkinter-application-to-switch-between-different-page-frames/
+
+# fonts
 TITLEFONT = ("calibri", 30)
 CAPTIONFONT = ()
 BUTTONFONT = ()
@@ -56,20 +58,39 @@ class mainMenu(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         welcomesign = tk.Label(self, text="SELAMAT DATANG", anchor="n", font=TITLEFONT)
+        welcomesign.grid(row = 0, column = 4, padx = 10, pady = 10)
         
-        modeManual_btn = ttk.Button(self, text ="Mode Manual",
-        command = lambda : controller.show_frame(modeManual))
+        modeManual_btn = tk.Button(self, text ="Mode Manual",
+        command = lambda : controller.show_frame(modeManual), height=15, width=30, font=BUTTONFONT)
+        modeManual_btn.grid()
 
-        modeOtomatis_btn = ttk.Button(self, text ="Mode Otomatis",
-        command = lambda : controller.show_frame(modeOtomatis))
+        modeOtomatis_btn = tk.Button(self, text ="Mode Otomatis",
+        command = lambda : controller.show_frame(modeOtomatis), height= 15, width= 30, font=BUTTONFONT)
+        modeOtomatis_btn.grid()
 
 class modeManual(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
 
+        manualSign = tk.Label(self, text="MODE MANUAL", anchor="n", font=TITLEFONT)
+        manualSign.grid(row = 0, column = 4, padx = 10, pady = 10)
+
+        # Back to main menu button
+        backToMainMenu = tk.Button(self, command = lambda : controller.show_frame(mainMenu), height= 5, width= 5)
+        # click_btn= tk.PhotoImage(file='clickme.png')
+        backToMainMenu.grid()
+        
+
+        
 class modeOtomatis(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
+        otomatisSign = tk.Label(self, text="MODE OTOMATIS", anchor="n", font=TITLEFONT)
+        otomatisSign.grid(row = 0, column = 4, padx = 10, pady = 10)
+        backToMainMenu = tk.Button(self, command = lambda : controller.show_frame(mainMenu), height= 5, width= 5)
+        # click_btn = tk.PhotoImage(file='clickme.png')
+        backToMainMenu.grid()
+        
 
 
 root = AngklungApp()
