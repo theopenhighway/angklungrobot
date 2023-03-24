@@ -43,6 +43,6 @@ while True:
             print(texterOFF + 'is sent')
             ser.write(texterOFF.encode('ascii'))
             #print(f"{command} {msg[1:]}\t| dt = {dt:.2f}")
-    else:
+    else: 
         time.sleep(0.001)
 
