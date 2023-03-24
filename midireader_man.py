@@ -1,14 +1,14 @@
 import time
 import rtmidi
 from rtmidi.midiutil import open_midiinput
-from rtmidi.midiconstants import NOTE_ON, NOTE_OFF, TIME_SIGNATURE, TEMPO, END_OF_TRACK
+# from rtmidi.midiconstants import NOTE_ON, NOTE_OFF, TIME_SIGNATURE, TEMPO, END_OF_TRACK
 import serial
 # import RPi.GPIO as GPIO
 # import spidev
 # from lib_nrf24 import NRF24
 
-#ser = serial.Serial('/dev/ttACM0',9600)
-#ser.flush()
+ser = serial.Serial('/dev/ttyUSB0',9600, timeout=1)
+ser.flush()
 
 intr = rtmidi.MidiIn()
 ports = intr.get_ports()
@@ -21,9 +21,10 @@ while True:
     if msgde:
         (msg, dt) = msgde
         command = hex(msg[0])
+        notestat = msg[0]
         notes = msg[1]
         velocity = msg[2]
-
+        
         # get motor ref numbergpio 
         if notes >= 72:
             motorNO = ((notes % 12) + 24) + 1
@@ -32,19 +33,16 @@ while True:
         else:
             motorNO = (notes % 12)  + 1
 
-        motorNOstr = str(motorNO) + '\n'
         if command == '0x90':
-            #ser.write("on \n")
-            #ser.write(motorNOstr.encode('ascii'))
-            print(motorNOstr)
+            texterON = 'Motor ' + str(motorNO) + ' on\n'
+            print(texterON + 'is sent')
+            ser.write(texterON.encode('ascii'))
             #print(f"{command} {msg[1:]}\t| dt = {dt:.2f}")
         elif command == '0x80':
-            #ser.write("off \n")
-            #ser.write(motorNOstr.encode('ascii'))
-            print(motorNOstr)
-            #ser.write(int(dt))
+            texterOFF = 'Motor ' + str(motorNO) + ' off\n'
+            print(texterOFF + 'is sent')
+            ser.write(texterOFF.encode('ascii'))
             #print(f"{command} {msg[1:]}\t| dt = {dt:.2f}")
-        # print(msgde)
-    else:
+    else: 
         time.sleep(0.001)
 
