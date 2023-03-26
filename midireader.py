@@ -1,43 +1,60 @@
 from mido import MidiFile
-from mido import Message
+import mido
 from time import sleep
 import serial
-import pyaudio
+# import pyaudio
 
-ser = serial.Serial('/dev/ttyUSB0',9600, timeout=1)
-ser.flush()
+# ser = serial.Serial('/dev/ttyUSB0',9600, timeout=1)
+# ser.flush()
 
-directo = '/home/milo17/Documents/angklungrobot/midi_files/'
-mid = MidiFile(directo + 'scale_c_major.mid')
-            
+directo = 'C:\\Users\\milo\\personal projects\\angklungrobot\\midi_files\\'
+mid = MidiFile(directo + 'twinkle-twinkle-little-star.mid')
+
+# print(mid.length)
+ticksPerBeat = mid.ticks_per_beat   
+tempo = 0         
+# print(ticksPerBeat)
+
+# get motor ref number
+def getMotorNo(note_num):
+    if note_num >= 72:
+        return str(((note_num % 12) + 24) + 1)
+    elif note_num >= 60:
+        return str(((note_num % 12) + 12) + 1)
+    else:
+        return str((note_num % 12)  + 1)
 
 for i, track in enumerate(mid.tracks):
-    #print('Track {}: {}'.format(i, track.name))
+    print('Track {}: {}'.format(i, track.name))
     for msg in track:
-        #ignores metadata
-        if not msg.is_meta:
-            note_num = msg.note
+        # tempo = getTempo(mid)
+        # print(msg.time)
 
-            # get motor ref number
-            if note_num < 48 & note_num > 72:
+        if msg.is_meta and msg.type == 'set_tempo':
+            # tempo: microsecond per quarter note
+            # default tempo: 120 BPM (500000 microsecond per quarter note)
+            # default time signature: 4/4
+            tempo = msg.tempo
+            
+        elif not msg.is_meta and (msg.type != 'control_change' and msg.type != 'program_change' and msg.type != 'aftertouch' and msg.type != 'pitchwheel' and msg.type != 'sysex'):
+
+            # skip if note number is not within the required range
+            if msg.note < 48 and msg.note > 72:
                 pass
+            
             else:
-                if note_num >= 72:
-                    motorNO = ((note_num % 12) + 24) + 1
-                elif note_num >= 60:
-                    motorNO = ((note_num % 12) + 12) + 1
-                else:
-                    motorNO = (note_num % 12)  + 1
-                    
-                #if note_on, then display output
                 if msg.type == 'note_on':
-                    texterON = 'Motor ' + str(motorNO) + ' on\n'
-                    print(texterON + 'is sent')
-                    ser.write(texterON.encode('ascii'))
-                elif msg.type == 'note off':
-                    texterOFF = 'Motor ' + str(motorNO) + ' off\n'
-                    print(texterOFF + 'is sent')
-                    ser.write(texterOFF.encode('ascii'))
+                    texterON = 'Motor ' + getMotorNo(msg.note) + ' on\n'
+                    # print(texterON + 'is sent')
+                    # ser.write(texterON.encode('ascii'))
+                    print(texterON)
 
-                # sleep(dt)
+                elif msg.type == 'note_off':
+                    texterOFF = 'Motor ' + getMotorNo(msg.note) + ' off\n'
+                    # print(texterOFF + 'is sent')
+                    # ser.write(texterOFF.encode('ascii'))
+                    print(texterOFF)
+                
+                dt = mido.tick2second(msg.time, ticksPerBeat, tempo)
+                sleep(dt)
 
