@@ -12,22 +12,23 @@ int relay10 = 11;
 int relay11 = 12;
 int relay12 = 13;
 int relay13 = 22;
-int relay14 = 12;
-int relay15 = 10;
-int relay16 = 11;
-int relay17 = 8;
-int relay18 = 9;
-int relay19 = 10;
-int relay20 = 11;
-int relay21 = 8;
-int relay22 = 10;
-int relay23 = 11;
-int relay24 = 12;
-int relay25 = 13;
+int relay14 = 24;
+int relay15 = 26;
+int relay16 = 28;
+int relay17 = 30;
+int relay18 = 32;
+int relay19 = 34;
+int relay20 = 36;
+int relay21 = 38;
+int relay22 = 40;
+int relay23 = 42;
+int relay24 = 44;
+int relay25 = 46;
 
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
+
   pinMode(relay1, OUTPUT);
   pinMode(relay2, OUTPUT);
   pinMode(relay3, OUTPUT);
@@ -274,73 +275,73 @@ void loop() {
       digitalWrite(LED_BUILTIN, LOW);
     }
     else if  (statusbyte.equals("Motor 12 off")) {
-      Serial.print("Motor 4 off ");
-      digitalWrite(relay4, HIGH);
+      Serial.print("Motor 12 off ");
+      digitalWrite(relay12, HIGH);
       digitalWrite(LED_BUILTIN, LOW);
     }
     else if (statusbyte.equals("Motor 13 off")) {
-      Serial.print("Motor 1 off \n");
-      digitalWrite(relay1, HIGH);
+      Serial.print("Motor 13 off \n");
+      digitalWrite(relay13, HIGH);
       digitalWrite(LED_BUILTIN, LOW);
     }
     else if (statusbyte.equals("Motor 14 off")) {
-      Serial.print("Motor 2 off \n");
-      digitalWrite(relay2, HIGH);
+      Serial.print("Motor 14 off \n");
+      digitalWrite(relay14, HIGH);
       digitalWrite(LED_BUILTIN, LOW);
     }
     else if  (statusbyte.equals("Motor 15 off")) {
-      Serial.print("Motor 3 off \n");
-      digitalWrite(relay3, HIGH);
+      Serial.print("Motor 15 off \n");
+      digitalWrite(relay15, HIGH);
       digitalWrite(LED_BUILTIN, LOW);
     }
     else if  (statusbyte.equals("Motor 16 off")) {
-      Serial.print("Motor 4 off ");
-      digitalWrite(relay4, HIGH);
+      Serial.print("Motor 16 off ");
+      digitalWrite(relay16, HIGH);
       digitalWrite(LED_BUILTIN, LOW);
     }
     else if (statusbyte.equals("Motor 17 off")) {
-      Serial.print("Motor 1 off \n");
-      digitalWrite(relay1, HIGH);
+      Serial.print("Motor 17 off \n");
+      digitalWrite(relay17, HIGH);
       digitalWrite(LED_BUILTIN, LOW);
     }
     else if (statusbyte.equals("Motor 18 off")) {
-      Serial.print("Motor 2 off \n");
-      digitalWrite(relay2, HIGH);
+      Serial.print("Motor 18 off \n");
+      digitalWrite(relay18, HIGH);
       digitalWrite(LED_BUILTIN, LOW);
     }
     else if  (statusbyte.equals("Motor 19 off")) {
-      Serial.print("Motor 3 off \n");
-      digitalWrite(relay3, HIGH);
+      Serial.print("Motor 19 off \n");
+      digitalWrite(relay19, HIGH);
       digitalWrite(LED_BUILTIN, LOW);
     }
     else if  (statusbyte.equals("Motor 20 off")) {
-      Serial.print("Motor 4 off ");
-      digitalWrite(relay4, HIGH);
+      Serial.print("Motor 20 off ");
+      digitalWrite(relay20, HIGH);
       digitalWrite(LED_BUILTIN, LOW);
     }
     else if (statusbyte.equals("Motor 21 off")) {
-      Serial.print("Motor 1 off \n");
-      digitalWrite(relay1, HIGH);
+      Serial.print("Motor 21 off \n");
+      digitalWrite(relay21, HIGH);
       digitalWrite(LED_BUILTIN, LOW);
     }
     else if (statusbyte.equals("Motor 22 off")) {
-      Serial.print("Motor 2 off \n");
-      digitalWrite(relay2, HIGH);
+      Serial.print("Motor 22 off \n");
+      digitalWrite(relay22, HIGH);
       digitalWrite(LED_BUILTIN, LOW);
     }
     else if  (statusbyte.equals("Motor 23 off")) {
-      Serial.print("Motor 3 off \n");
-      digitalWrite(relay3, HIGH);
+      Serial.print("Motor 23 off \n");
+      digitalWrite(relay23, HIGH);
       digitalWrite(LED_BUILTIN, LOW);
     }
     else if  (statusbyte.equals("Motor 24 off")) {
-      Serial.print("Motor 4 off \n");
-      digitalWrite(relay4, HIGH);
+      Serial.print("Motor 24 off \n");
+      digitalWrite(relay24, HIGH);
       digitalWrite(LED_BUILTIN, LOW);
     }
     else if  (statusbyte.equals("Motor 25 off")) {
-      Serial.print("Motor 4 off \n");
-      digitalWrite(relay4, HIGH);
+      Serial.print("Motor 25 off \n");
+      digitalWrite(relay25, HIGH);
       digitalWrite(LED_BUILTIN, LOW);
     }
   }
