@@ -7,9 +7,11 @@ import serial
 # import spidev
 # from lib_nrf24 import NRF24
 
-ser = serial.Serial('/dev/ttyUSB0',9600, timeout=1)
+# establish USB connection with microcontroller
+ser = serial.Serial('/dev/ttyUSB0',31250, timeout=1)
 ser.flush()
 
+#
 intr = rtmidi.MidiIn()
 ports = intr.get_ports()
 # print(ports)

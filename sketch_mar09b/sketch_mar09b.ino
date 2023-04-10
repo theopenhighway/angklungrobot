@@ -27,7 +27,7 @@ int relay25 = 46;
 
 void setup() {
   // put your setup code here, to run once:
-  Serial.begin(9600);
+  Serial.begin(31250);
 
   pinMode(relay1, OUTPUT);
   pinMode(relay2, OUTPUT);

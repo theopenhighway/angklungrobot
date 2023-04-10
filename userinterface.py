@@ -4,6 +4,8 @@ import serial
 from time import sleep
 # from PIL import ImageTk
 from tkinter.filedialog import askopenfilename
+import midireader_man
+import midireader
 
 # https://www.geeksforgeeks.org/tkinter-application-to-switch-between-different-page-frames/
 
