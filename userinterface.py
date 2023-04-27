@@ -101,27 +101,31 @@ class modeOtomatis(tk.Frame):
 
         backToMainMenu = tk.Button(self, command = lambda : controller.show_frame(mainMenu), height= 5, width= 5, image=self.backButtonPic)
         # click_btn = tk.PhotoImage(file='clickme.png')
-        backToMainMenu.grid(row = 0, column = 0, padx = 30, pady = 30)
+        backToMainMenu.grid(row = 0, column = 0, padx = 300, pady = 30)
 
         # get list of songs from a designated folder onto a listbox
         dir_path = "C:\\Users\\milo\\personal projects\\angklungrobot\\midi_files\\"
-        self.list = tk.Listbox()
+        songList = tk.Listbox(self)
         
         i = 0
         for file in os.listdir(dir_path):
             
             if os.path.isfile(os.path.join(dir_path, file)):
                 i = i + 1
-                self.list.insert(i,file)
+                songList.insert(i,file)
 
-        # self.list.pack(side=LEFT, expand=YES, fill=BOTH)
-        # self.list.bind("<<ListboxSelect>>", self.PrintSelected)
+        songList.grid(row = 0, column = 0, sticky = "w")
+        
+        # songList.bind("<<ListboxSelect>>", songList)
 
         # self.scroll = ttk.Scrollbar(self)
-        # self.scroll.pack(side=RIGHT, fill=Y)
+        # self.scroll.grid()
 
-        # self.scroll.configure(command=self.list.yview)
-        # self.list.configure(yscrollcommand=self.scroll.set)
+        
+        # songList.configure(yscrollcommand=self.scroll.set)
+        # self.scroll.configure(command=songList.yview)
+        # play button --> run midireader.py
+
         
 
 

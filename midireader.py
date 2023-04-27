@@ -1,32 +1,25 @@
 from mido import MidiFile
 import mido
-# from time import sleep
+from time import sleep
 import os
 import serial
 import serialConnection
 
 
-# ser = serial.Serial('COM7', 31250, timeout=1)
-ser = serial.Serial(serialConnection.getUSBPortName(),31250, timeout=1)
-ser.flushInput()
+# ser = serial.Serial(serialConnection.getUSBPortName(),31250, timeout=1)
+ser = serial.Serial('COM3',31250,timeout=1)
+ser.flush()
 
 directo = 'C:\\Users\\milo\\personal projects\\angklungrobot\\midi_files\\'
-mid = MidiFile(directo + 'Untitled score.mid')
+mid = MidiFile(directo + 'random noy.mid')
 
 
 # print(mid.length)
-ticksPerBeat = mid.ticks_per_beat          
+ticksPerBeat = mid.ticks_per_beat    
+dt = 0      
 # print(ticksPerBeat)
 
-# get motor ref number
-def getMotorNo(note_num):
-    if note_num >= 72:
-        return str(((note_num % 12) + 24) + 1)
-    elif note_num >= 60:
-        return str(((note_num % 12) + 12) + 1)
-    else:
-        return str((note_num % 12)  + 1)
-
+sleep(2)
 
 for i, track in enumerate(mid.tracks):
     # print('Track {}: {}'.format(i, track.name))
@@ -44,32 +37,27 @@ for i, track in enumerate(mid.tracks):
                 pass
             
             else:
-
+                dt = (mido.tick2second(msg.time, ticksPerBeat, tempo))
+                # intDT = str(int(dt))
+                
                 if msg.type == 'note_on' and msg.velocity > 0:
-                    texterON = 'Motor ' + getMotorNo(msg.note) + ' on\n'
-                    print(texterON + 'is sent')
+                    texterON = serialConnection.getMotorNo(msg.note) + ',' + 'on' + '\n'
+                    print(texterON)
                     ser.write(texterON.encode('ascii'))
                     
-                    # dtt = (pygame.midi.time() - prevTime)/1000
-                    # print(dtt, 'on')
-                    # sleep(dtt)
-                    
                 elif msg.type == 'note_on' and msg.velocity == 0:
-                    texterOFF = 'Motor ' + getMotorNo(msg.note) + ' off\n'
-                    print(texterOFF + 'is sent')
+                    texterOFF = serialConnection.getMotorNo(msg.note) + ',' + 'off' +  '\n'
+                    print(texterOFF)
                     ser.write(texterOFF.encode('ascii'))
 
                 elif msg.type == 'note_off':
-                    texterOFF = 'Motor ' + getMotorNo(msg.note) + ' off\n'
-                    print(texterOFF + 'is sent')
+                    texterOFF = serialConnection.getMotorNo(msg.note) + ',' + 'off' + '\n'
+                    print(texterOFF)
                     ser.write(texterOFF.encode('ascii'))
-
-                # print(dt)
-                dt = mido.tick2second(msg.time, ticksPerBeat, tempo)
-                # os.wait()
-
-                # sleep(dt + 1)
                 
+                sleep(dt)
+                
+                
+            
 
-
-ser.close()
+# ser.close()

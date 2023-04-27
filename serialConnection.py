@@ -7,15 +7,29 @@ def getUSBPortName():
     port = ""
         
     for n, (p, descriptor, hid) in enmu_ports:
-        print(p,descriptor, hid)
-        # print(descriptor)
+        # print(p,descriptor, hid)
+        print(descriptor)
         if "USB-SERIAL CH340 (COM4)" or "Standard Serial over Bluetooth link (COM8)" in descriptor:
             port = p.split()
             return str(port[0])
-    
-def getRFPortName():
+
+#converts note number to motor no (e.g. C3 - 48 = Motor 1)
+def getMotorNo(note_num):
+    if note_num >= 72:
+        return str(((note_num % 12) + 24) + 1)
+    elif note_num >= 60:
+        return str(((note_num % 12) + 12) + 1)
+    else:
+        return str((note_num % 12)  + 1)
+       
+def getRFAddress():
     print()
 
+def getFileName():
+    print()
+    
+def stopCode():
+    exit
 print(getUSBPortName())
 
 # import serial
