@@ -8,7 +8,7 @@ def getUSBPortName():
         
     for n, (p, descriptor, hid) in enmu_ports:
         # print(p,descriptor, hid)
-        print(descriptor)
+        # print(descriptor)
         if "USB-SERIAL CH340 (COM4)" or "Standard Serial over Bluetooth link (COM8)" in descriptor:
             port = p.split()
             return str(port[0])
@@ -22,15 +22,13 @@ def getMotorNo(note_num):
     else:
         return str((note_num % 12)  + 1)
        
-def getRFAddress():
-    print()
 
 def getFileName():
     print()
     
 def stopCode():
     exit
-print(getUSBPortName())
+# print(getUSBPortName())
 
 # import serial
 # from time import sleep
