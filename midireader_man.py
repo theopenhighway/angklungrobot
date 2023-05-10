@@ -19,45 +19,27 @@ ports = intr.get_ports()
 intr.open_port(1)
 
 while True:
-    if ser.is_open:
-        try:
-            msgde = intr.get_message()
+    msgde = intr.get_message()
 
-            if msgde:
-                (msg, dt) = msgde
-                command = hex(msg[0])
-                notestat = msg[0]
-                notes = msg[1]
-                velocity = msg[2]
+    if msgde:
+        (msg, dt) = msgde
+        command = hex(msg[0])
+        notestat = msg[0]
+        notes = msg[1]
+        velocity = msg[2]
 
-                if command == '0x90':
-                    # texterON = 'Motor ' + str(motorNO) + ' on\n'
-                    texterON = serialConnection.getMotorNo(msg.note) + ',' + 'on' + ',' + '' + '\n'
-                    print(texterON + 'is sent')
-                    ser.write(texterON.encode('ascii'))
-                    #print(f"{command} {msg[1:]}\t| dt = {dt:.2f}")
-                elif command == '0x80':
-                    # texterOFF = 'Motor ' + str(motorNO) + ' off\n'
-                    texterOFF = serialConnection.getMotorNo(msg.note) + ',' + 'off' + ',' + '' + '\n'
-                    print(texterOFF + 'is sent')
-                    ser.write(texterOFF.encode('ascii'))
-                    #print(f"{command} {msg[1:]}\t| dt = {dt:.2f}")
-                elif command == '0x90' and velocity == 0:
-                    # texterOFF = 'Motor ' + str(motorNO) + ' off\n'
-                    texterOFF = serialConnection.getMotorNo(msg.note) + ',' + 'off' + ',' + '' + '\n'
-                    print(texterOFF + 'is sent')
-                    ser.write(texterOFF.encode('ascii'))
-                    #print(f"{command} {msg[1:]}\t| dt = {dt:.2f}")            
-            else: 
-                time.sleep(0.001)
-        except:
-            ser.close()
-    else:
-        try:
-            ser = serial.Serial('/dev/ttyUSB0',31250, timeout=1)
-            ser.flush()
-        except:
-            pass
-    
-    time.sleep(1)
+        if command == '0x90':
+            texterON = serialConnection.getMotorNo(msg.note) + ',' + 'on' + '\n'
+            print(texterON + 'is sent')
+            ser.write(texterON.encode('ascii'))
+        elif command == '0x80':
+            texterOFF = serialConnection.getMotorNo(msg.note) + ',' + 'off'  + '\n'
+            print(texterOFF + 'is sent')
+            ser.write(texterOFF.encode('ascii'))
+        elif command == '0x90' and velocity == 0:
+            texterOFF = serialConnection.getMotorNo(msg.note) + ',' + 'off'  + '\n'
+            print(texterOFF + 'is sent')
+            ser.write(texterOFF.encode('ascii'))           
+    else: 
+        time.sleep(0.001)
 

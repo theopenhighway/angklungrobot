@@ -7,17 +7,19 @@ import serialConnection
 
 
 # ser = serial.Serial(serialConnection.getUSBPortName(),31250, timeout=1)
-ser = serial.Serial('COM3',31250,timeout=1)
+ser = serial.Serial('COM4',31250,timeout=1)
 ser.flush()
 
 directo = 'C:\\Users\\milo\\personal projects\\angklungrobot\\midi_files\\'
-mid = MidiFile(directo + 'random noy.mid')
+songTitle = 'twinkle-twinkle-little-star.mid'
+mid = MidiFile(directo + songTitle)
 
 
 # print(mid.length)
 ticksPerBeat = mid.ticks_per_beat    
 dt = 0      
 # print(ticksPerBeat)
+
 
 sleep(2)
 

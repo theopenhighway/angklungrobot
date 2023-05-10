@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>640</width>
+    <width>644</width>
     <height>480</height>
    </rect>
   </property>
@@ -14,7 +14,7 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QLabel" name="label">
+   <widget class="QLabel" name="modeOtomatisTitle">
     <property name="geometry">
      <rect>
       <x>110</x>
@@ -34,63 +34,17 @@
      <string>MODE OTOMATIS</string>
     </property>
    </widget>
-   <widget class="QListWidget" name="songList">
+   <widget class="QLabel" name="songTitle">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>140</y>
-      <width>311</width>
-      <height>271</height>
-     </rect>
-    </property>
-    <item>
-     <property name="text">
-      <string>efefefe</string>
-     </property>
-    </item>
-   </widget>
-   <widget class="QScrollBar" name="verticalScrollBar">
-    <property name="geometry">
-     <rect>
-      <x>300</x>
-      <y>150</y>
-      <width>20</width>
-      <height>251</height>
-     </rect>
-    </property>
-    <property name="orientation">
-     <enum>Qt::Vertical</enum>
-    </property>
-   </widget>
-   <widget class="QLabel" name="pilihanLaguText">
-    <property name="geometry">
-     <rect>
-      <x>120</x>
-      <y>110</y>
-      <width>91</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>12</pointsize>
-     </font>
-    </property>
-    <property name="text">
-     <string>Pilihan Lagu</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_3">
-    <property name="geometry">
-     <rect>
-      <x>350</x>
-      <y>210</y>
+      <x>370</x>
+      <y>230</y>
       <width>261</width>
       <height>41</height>
      </rect>
     </property>
     <property name="text">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:14pt; font-weight:600;&quot;&gt;Judul Lagu&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:14pt;&quot;&gt;Judul Lagu&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
    <widget class="QPushButton" name="backButton1">
@@ -109,8 +63,8 @@
    <widget class="QPushButton" name="pushButton">
     <property name="geometry">
      <rect>
-      <x>440</x>
-      <y>290</y>
+      <x>420</x>
+      <y>280</y>
       <width>75</width>
       <height>23</height>
      </rect>
@@ -119,17 +73,101 @@
      <string>Play</string>
     </property>
    </widget>
-   <widget class="QProgressBar" name="progressBar">
+   <widget class="QPushButton" name="stopButton">
     <property name="geometry">
      <rect>
-      <x>360</x>
-      <y>260</y>
-      <width>251</width>
+      <x>510</x>
+      <y>280</y>
+      <width>75</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Stop</string>
+    </property>
+   </widget>
+   <widget class="QScrollArea" name="scrollArea">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>120</y>
+      <width>331</width>
+      <height>291</height>
+     </rect>
+    </property>
+    <property name="widgetResizable">
+     <bool>true</bool>
+    </property>
+    <widget class="QWidget" name="scrollAreaWidgetContents">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>0</y>
+       <width>329</width>
+       <height>289</height>
+      </rect>
+     </property>
+     <widget class="QListWidget" name="songList">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>30</y>
+        <width>331</width>
+        <height>271</height>
+       </rect>
+      </property>
+      <item>
+       <property name="text">
+        <string>efefefe</string>
+       </property>
+      </item>
+     </widget>
+     <widget class="QLabel" name="pilihanLaguText">
+      <property name="geometry">
+       <rect>
+        <x>120</x>
+        <y>0</y>
+        <width>101</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Pilihan Lagu</string>
+      </property>
+     </widget>
+    </widget>
+   </widget>
+   <widget class="QLabel" name="nowPlaying">
+    <property name="geometry">
+     <rect>
+      <x>370</x>
+      <y>200</y>
+      <width>261</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:14pt; font-weight:600;&quot;&gt;NOW PLAYING&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+   </widget>
+   <widget class="QToolButton" name="settingsButton">
+    <property name="geometry">
+     <rect>
+      <x>610</x>
+      <y>10</y>
+      <width>23</width>
       <height>20</height>
      </rect>
     </property>
-    <property name="value">
-     <number>24</number>
+    <property name="text">
+     <string>...</string>
     </property>
    </widget>
   </widget>
@@ -138,7 +176,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>640</width>
+     <width>644</width>
      <height>22</height>
     </rect>
    </property>
