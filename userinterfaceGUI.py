@@ -1,8 +1,12 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtWidgets import QMenu, QMessageBox
+from PyQt5.QtGui import QIcon
+import serial
 
-HEIGHT = 960
+HEIGHT = 720
 WIDTH = 1280
 
+# main menu page
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
@@ -101,18 +105,19 @@ class Ui_MainWindow(object):
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def midiManual(self):
-        # print("hi")
-        self.Form = QtWidgets.QMainWindow()
+        self.modeManual = QtWidgets.QMainWindow()
         self.ui = Ui_modeManual()
-        self.ui.setupUi(self.Form)
-        self.Form.show()
-    
+        self.ui.setupUi(self.modeManual)
+        self.modeManual.showMaximized()
+        MainWindow.hide()
+        
     def midiOtomatis(self):
-        # print("hi")
-        self.Form = QtWidgets.QMainWindow()
+        self.modeOtomatis = QtWidgets.QMainWindow()
         self.ui = Ui_modeOtomatis()
-        self.ui.setupUi(self.Form)
-        self.Form.show()
+        self.ui.setupUi(self.modeOtomatis)
+
+        self.modeOtomatis.show()
+        MainWindow.hide()
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -125,6 +130,7 @@ class Ui_MainWindow(object):
         self.manualText.setText(_translate("MainWindow", "<html><head/><body><p align=\"center\">Mainkan angklung ini dengan menekan tuts <br/>pada keyboard yang telah disediakan</p></body></html>"))
         self.otomatisText.setText(_translate("MainWindow", "<html><head/><body><p align=\"center\">Ingin melihat angklung ini bermain secara otomatis? <br/>Pilihlah mode ini</p></body></html>"))
 
+# mode manual page
 class Ui_modeManual(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
@@ -136,14 +142,20 @@ class Ui_modeManual(object):
         self.verticalLayout_3 = QtWidgets.QVBoxLayout()
         self.verticalLayout_3.setSizeConstraint(QtWidgets.QLayout.SetNoConstraint)
         self.verticalLayout_3.setObjectName("verticalLayout_3")
+        
         self.formLayout = QtWidgets.QFormLayout()
         self.formLayout.setObjectName("formLayout")
+        
+        # back button
         self.backButton = QtWidgets.QPushButton(self.centralwidget)
         self.backButton.setObjectName("backButton")
         self.formLayout.setWidget(0, QtWidgets.QFormLayout.LabelRole, self.backButton)
+        
+        # settings button
         self.settingsButton = QtWidgets.QToolButton(self.centralwidget)
         self.settingsButton.setObjectName("settingsButton")
         self.formLayout.setWidget(0, QtWidgets.QFormLayout.FieldRole, self.settingsButton)
+        
         self.verticalLayout_3.addLayout(self.formLayout)
         self.modeManualTitle = QtWidgets.QLabel(self.centralwidget)
         font = QtGui.QFont()
@@ -153,13 +165,16 @@ class Ui_modeManual(object):
         self.modeManualTitle.setFont(font)
         self.modeManualTitle.setObjectName("modeManualTitle")
         self.verticalLayout_3.addWidget(self.modeManualTitle, 0, QtCore.Qt.AlignHCenter|QtCore.Qt.AlignCenter)
+        
         self.manualInst = QtWidgets.QLabel(self.centralwidget)
         self.manualInst.setObjectName("manualInst")
         self.verticalLayout_3.addWidget(self.manualInst, 0, QtCore.Qt.AlignHCenter|QtCore.Qt.AlignCenter)
+        
         self.horizontalLayout_3 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_3.setObjectName("horizontalLayout_3")
         self.verticalLayout_3.addLayout(self.horizontalLayout_3)
         self.verticalLayout_2.addLayout(self.verticalLayout_3)
+        
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 831, 22))
@@ -172,6 +187,13 @@ class Ui_modeManual(object):
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
+    def backToMainMenu(self):
+        self.modeManual = QtWidgets.QMainWindow()
+        self.ui = Ui_modeManual()
+        self.ui.setupUi(self.modeManual)
+        self.modeManual.showMaximized()
+        MainWindow.hide()
+
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
@@ -180,11 +202,11 @@ class Ui_modeManual(object):
         self.modeManualTitle.setText(_translate("MainWindow", "MODE MANUAL"))
         self.manualInst.setText(_translate("MainWindow", "<html><head/><body><p align=\"center\"><span style=\" font-size:14pt;\">Silahkan tekan tuts keyboard yang disediakan untuk <br/>berinteraksi langsung dengan angklung ini!</span></p></body></html>"))
 
-
+# mode otomatis page
 class Ui_modeOtomatis(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1280, 960)
+        MainWindow.resize(WIDTH, HEIGHT)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.centralwidget)
@@ -241,10 +263,12 @@ class Ui_modeOtomatis(object):
         self.horizontalLayout_11.addWidget(self.playButton)
 
         # stop button
+        self.verticalLayout.addLayout(self.horizontalLayout_11)
         self.stopButton = QtWidgets.QPushButton(self.centralwidget)
         self.stopButton.setObjectName("stopButton")
-        self.horizontalLayout_11.addWidget(self.stopButton)
-        
+        # self.horizontalLayout_11.addWidget(self.stopButton)
+        self.verticalLayout.addWidget(self.stopButton)
+
         MainWindow.setCentralWidget(self.centralwidget)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
@@ -267,9 +291,34 @@ class Ui_modeOtomatis(object):
                 self.listWidget.addItem(QtWidgets.QListWidgetItem(file))
         
         # scroll bar for list widget
-        self.scrollBar = QtWidgets.QScrollBar(self)
-        self.listWidget.setVerticalScrollBar(self.scrollBar)
-                
+        # self.scrollBar = QtWidgets.QScrollBar(self.listWidget)
+        # self.listWidget.addScrollBarWidget(self.scrollBar, QtCore.Qt.AlignRight)
+        # self.listWidget.verticalScrollBar()
+        
+
+        # set value when user presses list widget
+        # self.listWidget.setSelectionMode(QtWidgets.QAbstractItemView.selectionMode())
+        # for item in self.listwidget.selectedItems():
+            # print(item.text())
+
+    def returnToMainMenu(self):
+        print()
+
+    # if serial connection failed, then a pop up menu will show up
+    def popUpUSB(self):
+        msg = QMessageBox()
+        msg.setWindowTitle("Angklung Tidak Terhubung")
+        msg.setText("Sambungkan kembali koneksi USB Raspberry Pi dengan mikrokontroller.")
+        msg.setIcon(QMessageBox.Critical)
+        msg.setStandardButtons(QMessageBox.Retry|QMessageBox.Ignore)
+        msg.buttonClicked.connect(self.popUpButton)
+    
+    def popUpButton(self, i):
+        if i.text() == 'Retry':
+            print()
+        elif i.text == 'Xancel':
+            print()
+
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))

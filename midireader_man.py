@@ -1,21 +1,18 @@
 import time
 import rtmidi
 from rtmidi.midiutil import open_midiinput
-# from rtmidi.midiconstants import NOTE_ON, NOTE_OFF, TIME_SIGNATURE, TEMPO, END_OF_TRACK
 import serial
 import serialConnection
-# import RPi.GPIO as GPIO
-# import spidev
-# from lib_nrf24 import NRF24
+
 
 # establish USB connection with microcontroller
 ser = serial.Serial(serialConnection.getUSBPortName(),31250, timeout=1)
 ser.flush()
 
-#
+
 intr = rtmidi.MidiIn()
 ports = intr.get_ports()
-# print(ports)
+
 intr.open_port(1)
 
 while True:
