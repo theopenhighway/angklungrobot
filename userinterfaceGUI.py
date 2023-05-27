@@ -1,7 +1,8 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QMenu, QMessageBox
+from PyQt5.QtWidgets import QMenu, QMessageBox, QMainWindow
 from PyQt5.QtGui import QIcon
 import serial
+# import midireader, midireader_man, serialConnection
 
 HEIGHT = 720
 WIDTH = 1280
@@ -11,13 +12,17 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(WIDTH, HEIGHT)
+        # QMainWindow.setWindowTitle("AngklungRobot")
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.centralwidget)
         self.verticalLayout.setObjectName("verticalLayout")
+
+        # settings button
         self.toolButton = QtWidgets.QToolButton(self.centralwidget)
         self.toolButton.setObjectName("toolButton")
         self.verticalLayout.addWidget(self.toolButton, 0, QtCore.Qt.AlignLeft)
+
         self.verticalLayout_2 = QtWidgets.QVBoxLayout()
         self.verticalLayout_2.setObjectName("verticalLayout_2")
         
@@ -134,6 +139,7 @@ class Ui_MainWindow(object):
 class Ui_modeManual(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
+        MainWindow.setWindowTitle('AngklungRobot')
         MainWindow.resize(WIDTH, HEIGHT)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
@@ -150,7 +156,8 @@ class Ui_modeManual(object):
         self.backButton = QtWidgets.QPushButton(self.centralwidget)
         self.backButton.setObjectName("backButton")
         self.formLayout.setWidget(0, QtWidgets.QFormLayout.LabelRole, self.backButton)
-        
+        self.backButton.clicked.connect(self.backToMainMenu)
+
         # settings button
         self.settingsButton = QtWidgets.QToolButton(self.centralwidget)
         self.settingsButton.setObjectName("settingsButton")
@@ -188,10 +195,10 @@ class Ui_modeManual(object):
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def backToMainMenu(self):
-        self.modeManual = QtWidgets.QMainWindow()
-        self.ui = Ui_modeManual()
-        self.ui.setupUi(self.modeManual)
-        self.modeManual.showMaximized()
+        self.mainMenu = QtWidgets.QMainWindow()
+        self.ui = Ui_MainWindow()
+        self.ui.setupUi(self.mainMenu)
+        self.mainMenu.show()
         MainWindow.hide()
 
     def retranslateUi(self, MainWindow):
@@ -206,6 +213,7 @@ class Ui_modeManual(object):
 class Ui_modeOtomatis(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
+        MainWindow.setWindowTitle("AngklungRobot")
         MainWindow.resize(WIDTH, HEIGHT)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
@@ -221,14 +229,20 @@ class Ui_modeOtomatis(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.backButton.sizePolicy().hasHeightForWidth())
         
+        # back to menu button
         self.backButton.setSizePolicy(sizePolicy)
         self.backButton.setObjectName("backButton")
         self.formLayout_3.setWidget(0, QtWidgets.QFormLayout.LabelRole, self.backButton)
+        self.backButton.clicked.connect(self.backToMainMenu)
+
+        # settings menu
         self.toolButton = QtWidgets.QToolButton(self.centralwidget)
         self.toolButton.setObjectName("toolButton")
         self.formLayout_3.setWidget(0, QtWidgets.QFormLayout.FieldRole, self.toolButton)
+        self.toolButton.setPopupMode(QtWidgets.QToolButton.InstantPopup)
+        # self.toolButton.setMenu(self.contextMenu)
+
         self.verticalLayout.addLayout(self.formLayout_3)
-        
         self.modeOtomatisTitle = QtWidgets.QLabel(self.centralwidget)
         font = QtGui.QFont()
         font.setPointSize(36)
@@ -268,7 +282,8 @@ class Ui_modeOtomatis(object):
         self.stopButton.setObjectName("stopButton")
         # self.horizontalLayout_11.addWidget(self.stopButton)
         self.verticalLayout.addWidget(self.stopButton)
-
+        self.backButton.clicked.connect(self.stopMIDI)
+        
         MainWindow.setCentralWidget(self.centralwidget)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
@@ -283,7 +298,7 @@ class Ui_modeOtomatis(object):
 
         # gets song title based file name to list widget
         import os
-        dir_path = "C:\\Users\\milo\\personal projects\\angklungrobot\\midi_files\\"
+        dir_path = "midi_files\\"
         
         for file in os.listdir(dir_path):
             
@@ -297,12 +312,47 @@ class Ui_modeOtomatis(object):
         
 
         # set value when user presses list widget
-        # self.listWidget.setSelectionMode(QtWidgets.QAbstractItemView.selectionMode())
-        # for item in self.listwidget.selectedItems():
-            # print(item.text())
+        self.listWidget.clicked.connect(self.getListItem)
+        songTitle = self.getListItem(self)
+        
+        self.playButton.clicked.connect(self.playMIDI(songTitle))
 
-    def returnToMainMenu(self):
-        print()
+        # context menu when toolbar is pressed
+        # self.contextMenu = QMenu()
+        # statusAction = self.contextMenu.addAction("Status: ", self.actionStatus)
+        # aboutAction = self.contextMenu.addAdction("Help", self.aboutSection)
+        # settingsAction = self.contextMenu.addAction("Settings", self.actionSettings)
+
+    #prints the selected item
+    def getListItem(self):    
+        # print(self.listWidget.currentItem().text())
+        return self.listWidget.currentItem().text()
+
+    def actionStatus(self):
+        print('x')
+    
+    def aboutSection(self):
+        print('y')
+
+    def actionSettings(self):
+        print('z')
+
+    # run midireader function
+    def playMIDI(self, songTitle):
+        # midireader.midiOtomatis(songTitle)
+        pass
+    
+    # stop midireader function
+    def stopMIDI(self):
+        pass
+    
+    # return to main menu
+    def backToMainMenu(self):
+        self.mainMenu = QtWidgets.QMainWindow()
+        self.ui = Ui_MainWindow()
+        self.ui.setupUi(self.mainMenu)
+        self.mainMenu.show()
+        Controller.hideMidiOtomatis(self)
 
     # if serial connection failed, then a pop up menu will show up
     def popUpUSB(self):
@@ -329,6 +379,30 @@ class Ui_modeOtomatis(object):
         self.playButton.setText(_translate("MainWindow", "Play"))
         self.stopButton.setText(_translate("MainWindow", "Stop"))
 
+class Controller:
+    def __init___(self):
+        pass
+    
+    def hideMidiManual(self):
+        self.modeManual = QtWidgets.QMainWindow()
+        self.ui = Ui_modeManual()
+        self.ui.setupUi(self.modeManual)
+        self.modeManual.hide()
+        
+    def hideMidiOtomatis(self):
+        self.modeOtomatis = QtWidgets.QMainWindow()
+        self.ui = Ui_modeOtomatis()
+        self.ui.setupUi(self.modeOtomatis)
+
+        self.modeOtomatis.hide()
+    
+    def settingsButton(self, event):
+        contextMenu = QMenu(self)
+        statusAction = contextMenu.addAction("Status: ", self.actionStatus)
+        aboutAction = contextMenu.addAdction("About", self.aboutSection)
+        settingsAction = contextMenu.addAction("Settings", self.actionSettings)
+
+    
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
