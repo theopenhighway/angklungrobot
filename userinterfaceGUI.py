@@ -1,8 +1,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QMenu, QMessageBox, QMainWindow, QWidget
+from PyQt5.QtWidgets import QMenu, QMessageBox, QMainWindow, QWidget, QAction
 from PyQt5.QtCore import Qt, QThread
 from PyQt5.QtGui import QIcon
-from time import sleep
 import serial
 # import midireader, midireader_man, serialConnection
 import ngetestdoang
@@ -149,6 +148,13 @@ def tt():
     while condition:
         print('1')
         QThread.msleep(100)  # Simulate some work
+
+class WorkerThreadOtomatis(QThread):
+    def run(self):
+        # midireader.midiOtomatis(songTitleX)
+        pass
+    
+    QThread.msleep(100)  # Simulate some work
 
 # mode manual page
 class Ui_modeManual(QWidget):
@@ -356,7 +362,10 @@ class Ui_modeOtomatis(object):
         # statusAction = self.contextMenu.addAction("Status: ", self.actionStatus)
         # aboutAction = self.contextMenu.addAdction("Help", self.aboutSection)
         # settingsAction = self.contextMenu.addAction("Settings", self.actionSettings)
-        
+    def contextMenu(self):
+        contextMenu = QMenu(self)
+        statusAction = QAction
+
     def actionStatus(self):
         print('x')
     
@@ -369,7 +378,13 @@ class Ui_modeOtomatis(object):
     # stop midireader function
     def stopMIDI(self):
         pass
-    
+
+    def hideMidiOtomatis(self):
+        self.modeOtomatis = QtWidgets.QMainWindow()
+        self.ui = Ui_modeOtomatis()
+        self.ui.setupUi(self.modeOtomatis)
+        self.modeOtomatis.hide()
+
     # return to main menu
     def backToMainMenu(self):
         self.mainMenu = QtWidgets.QMainWindow()
@@ -377,7 +392,7 @@ class Ui_modeOtomatis(object):
         self.ui.setupUi(self.mainMenu)
         self.mainMenu.show()
         MainWindow.hide()
-        Controller.hideMidiOtomatis(self)
+        self.hideMidiOtomatis()
 
     # if serial connection failed, then a pop up menu will show up
     def popUpUSB(self):
@@ -403,28 +418,6 @@ class Ui_modeOtomatis(object):
         self.label.setText(_translate("MainWindow", "Pilihan Lagu"))
         self.playButton.setText(_translate("MainWindow", "Play"))
         self.stopButton.setText(_translate("MainWindow", "Stop"))
-
-class Controller:
-    def __init___(self):
-        pass
-    
-    def hideMidiManual(self):
-        self.modeManual = QtWidgets.QMainWindow()
-        self.ui = Ui_modeManual()
-        self.ui.setupUi(self.modeManual)
-        self.modeManual.hide()
-        
-    def hideMidiOtomatis(self):
-        self.modeOtomatis = QtWidgets.QMainWindow()
-        self.ui = Ui_modeOtomatis()
-        self.ui.setupUi(self.modeOtomatis)
-        self.modeOtomatis.hide()
-    
-    def settingsButton(self, event):
-        contextMenu = QMenu(self)
-        statusAction = contextMenu.addAction("Status: ", self.actionStatus)
-        aboutAction = contextMenu.addAdction("About", self.aboutSection)
-        settingsAction = contextMenu.addAction("Settings", self.actionSettings)
 
     
 if __name__ == "__main__":
