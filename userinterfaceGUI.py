@@ -1,10 +1,9 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMenu, QMessageBox, QWidget, QAction
-from PyQt5.QtCore import Qt, QThread, pyqtSignal
+from PyQt5.QtCore import QThread, pyqtSignal
 from PyQt5.QtGui import QIcon
 import serial
-import midireader, ngetestdoang
-
+import midireader
 
 HEIGHT = 720
 WIDTH = 1280
