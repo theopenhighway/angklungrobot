@@ -1,10 +1,10 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QMenu, QMessageBox, QMainWindow, QWidget, QAction
-from PyQt5.QtCore import Qt, QThread
+from PyQt5.QtWidgets import QMenu, QMessageBox, QWidget, QAction
+from PyQt5.QtCore import Qt, QThread, pyqtSignal
 from PyQt5.QtGui import QIcon
 import serial
-# import midireader, midireader_man, serialConnection
-import ngetestdoang
+import midireader, ngetestdoang
+
 
 HEIGHT = 720
 WIDTH = 1280
@@ -149,12 +149,25 @@ def tt():
         print('1')
         QThread.msleep(100)  # Simulate some work
 
-class WorkerThreadOtomatis(QThread):
+class MidiPlayerThread(QThread):
+    finished = pyqtSignal()
+
+    def __init__(self, song_title):
+        super().__init__()
+        self.song_title = song_title
+        self.paused = False
+
     def run(self):
-        # midireader.midiOtomatis(songTitleX)
-        pass
-    
-    QThread.msleep(100)  # Simulate some work
+        midireader.midiOtomatis(self.song_title, self)
+
+    def pause(self):
+        self.paused = True
+
+    def resume(self):
+        self.paused = False
+
+    def is_paused(self):
+        return self.paused
 
 # mode manual page
 class Ui_modeManual(QWidget):
@@ -311,6 +324,12 @@ class Ui_modeOtomatis(object):
         self.playButton.setObjectName("playButton")
         self.horizontalLayout_11.addWidget(self.playButton)
 
+        # pause button
+        self.verticalLayout.addLayout(self.horizontalLayout_11)
+        self.pauseButton = QtWidgets.QPushButton(self.centralwidget)
+        self.pauseButton.setObjectName("pauseButton")
+        self.verticalLayout.addWidget(self.pauseButton)
+
         # stop button
         self.verticalLayout.addLayout(self.horizontalLayout_11)
         self.stopButton = QtWidgets.QPushButton(self.centralwidget)
@@ -347,37 +366,83 @@ class Ui_modeOtomatis(object):
         
 
         # set value when user presses list widget
-        self.listWidget.clicked.connect(lambda: self.listWidget.currentItem().text())
+        # self.listWidget.clicked.connect(lambda: self.listWidget.currentItem().text())
         
-        # songTitle = self.getListItem(self)
+        self.listWidget.itemClicked.connect(self.on_item_clicked)
         
-        # add command for play button; run midireader
-        self.playButton.clicked.connect(lambda: ngetestdoang.teste(12))
-        
+        # add command for play button
+        self.playButton.clicked.connect(self.run_midi)
+
+        # pause midi 
+        self.pauseButton.clicked.connect(self.pause_midi)
+        self.pauseButton.setEnabled(False)
+
         # stop midi
-        self.stopButton.clicked.connect(self.stopMIDI)
+        self.stopButton.clicked.connect(self.stop_midi)
+        self.stopButton.setEnabled(False)
 
-        # context menu when toolbar is pressed
-        # self.contextMenu = QMenu()
-        # statusAction = self.contextMenu.addAction("Status: ", self.actionStatus)
-        # aboutAction = self.contextMenu.addAdction("Help", self.aboutSection)
-        # settingsAction = self.contextMenu.addAction("Settings", self.actionSettings)
-    def contextMenu(self):
-        contextMenu = QMenu(self)
-        statusAction = QAction
+    def on_item_clicked(self, item):
+        self.selected_item = item.text()
+        return self.selected_item
+       
+    def run_midi(self):
+        song_title = self.selected_item  # Replace 'your_song_title.mid' with the actual song title
+        self.midi_player_thread = MidiPlayerThread(song_title)
+        self.midi_player_thread.finished.connect(self.on_midi_finished)
+        self.midi_player_thread.start()
+        self.playButton.setEnabled(False)
+        self.pauseButton.setEnabled(True)
+        self.stopButton.setEnabled(True)
 
-    def actionStatus(self):
-        print('x')
-    
-    def aboutSection(self):
-        print('y')
+    def pause_midi(self):
+        if self.midi_player_thread and not self.midi_player_thread.is_paused():
+            self.midi_player_thread.pause()
+            self.pauseButton.setText('Resume')
+        elif self.midi_player_thread:
+            self.midi_player_thread.resume()
+            self.pauseButton.setText('Pause')
 
-    def actionSettings(self):
-        print('z')
-    
-    # stop midireader function
-    def stopMIDI(self):
-        pass
+    def stop_midi(self):
+        if self.midi_player_thread:
+            self.midi_player_thread.terminate()
+            self.midi_player_thread = None
+        self.playButton.setEnabled(True)
+        self.pauseButton.setEnabled(False)
+        self.pauseButton.setText('Pause')
+        self.stopButton.setEnabled(False)
+
+    def on_midi_finished(self):
+        self.midi_player_thread = None
+        self.playButton.setEnabled(True)
+        self.pauseButton.setEnabled(False)
+        self.pauseButton.setText('Pause')
+        self.stopButton.setEnabled(False)
+
+    # context menu when toolbar is pressed
+    def show_context_menu(self):
+        context_menu = QMenu(self)
+        settingsMenu = QAction("Settings", self)
+        statusMenu = QAction("Status: ", self)
+        helpMenu = QAction("Help", self)
+
+        context_menu.addAction(settingsMenu)
+        context_menu.addAction(statusMenu)
+        context_menu.addAction(helpMenu)
+
+        settingsMenu.triggered.connect(self.handle_action1)
+        statusMenu.triggered.connect(self.handle_action2)
+        helpMenu.triggered.connect(self.handle_action3)
+
+        context_menu.exec_(self.button.mapToGlobal(self.button.rect().bottomLeft()))
+
+    def handle_action1(self):
+        print("Action 1 triggered")
+
+    def handle_action2(self):
+        print("Action 2 triggered")
+
+    def handle_action3(self):
+        print("Action 3 triggered")
 
     def hideMidiOtomatis(self):
         self.modeOtomatis = QtWidgets.QMainWindow()
@@ -417,6 +482,7 @@ class Ui_modeOtomatis(object):
         self.modeOtomatisTitle.setText(_translate("MainWindow", "MODE OTOMATIS"))
         self.label.setText(_translate("MainWindow", "Pilihan Lagu"))
         self.playButton.setText(_translate("MainWindow", "Play"))
+        self.pauseButton.setText(_translate("MainWindow", "Pause"))
         self.stopButton.setText(_translate("MainWindow", "Stop"))
 
     

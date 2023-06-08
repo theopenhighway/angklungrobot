@@ -4,8 +4,9 @@ from time import sleep
 import os
 import serial
 import serialConnection
+from PyQt5.QtCore import QThread
 
-def midiOtomatis(songTitleX):
+def midiOtomatis(songTitleX, thread):
     # ser = serial.Serial(serialConnection.getUSBPortName(),31250, timeout=1)
     # ser = serial.Serial('COM4',31250,timeout=1)
     # ser.flush()
@@ -64,6 +65,14 @@ def midiOtomatis(songTitleX):
                         # ser.write(texterOFF.encode('ascii'))
                     
                     sleep(dt)
+
+            if thread.is_paused():
+                while thread.is_paused():
+                    QThread.msleep(100)  # Sleep to reduce CPU usage while paused
+
+            if thread.isInterruptionRequested():
+                return
+
                     
             
 
