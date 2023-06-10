@@ -1,12 +1,13 @@
 import time
 import rtmidi
-from rtmidi.midiutil import open_midiinput
 import serial
 import serialConnection
 
+
 def midiManual():
     # establish USB connection with microcontroller
-    ser = serial.Serial(serialConnection.getUSBPortName(),31250, timeout=1)
+    # ser = serial.Serial(serialConnection.getUSBPortName(),31250, timeout=1)
+    ser = serial.Serial('COM3',31250, timeout=1)
     ser.flush()
 
     global condition

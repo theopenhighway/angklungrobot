@@ -1,15 +1,15 @@
 from mido import MidiFile
 import mido
 from time import sleep
-import os
 import serial
 import serialConnection
+import rtmidi
 from PyQt5.QtCore import QThread
 
 def midiOtomatis(songTitleX, thread):
     # ser = serial.Serial(serialConnection.getUSBPortName(),31250, timeout=1)
-    # ser = serial.Serial('COM4',31250,timeout=1)
-    # ser.flush()
+    ser = serial.Serial('COM3',31250,timeout=1)
+    ser.flush()
 
     directo = 'midi_files\\'
     #songTitle = 'twinkle-twinkle-little-star.mid'
@@ -52,17 +52,17 @@ def midiOtomatis(songTitleX, thread):
                     if msg.type == 'note_on' and msg.velocity > 0:
                         texterON = serialConnection.getMotorNo(msg.note) + ',' + 'on' + '\n'
                         print(texterON)
-                        # ser.write(texterON.encode('ascii'))
+                        ser.write(texterON.encode('ascii'))
                         
                     elif msg.type == 'note_on' and msg.velocity == 0:
                         texterOFF = serialConnection.getMotorNo(msg.note) + ',' + 'off' +  '\n'
                         print(texterOFF)
-                        # ser.write(texterOFF.encode('ascii'))
+                        ser.write(texterOFF.encode('ascii'))
 
                     elif msg.type == 'note_off':
                         texterOFF = serialConnection.getMotorNo(msg.note) + ',' + 'off' + '\n'
                         print(texterOFF)
-                        # ser.write(texterOFF.encode('ascii'))
+                        ser.write(texterOFF.encode('ascii'))
                     
                     sleep(dt)
 
@@ -74,6 +74,39 @@ def midiOtomatis(songTitleX, thread):
                 return
 
                     
-            
+def midiManual(thread):
+    ser = serial.Serial('COM3', 31250, timeout=1)
+    ser.flush()
+
+    intr = rtmidi.MidiIn()
+    ports = intr.get_ports()
+
+    intr.open_port(0)
+
+    while thread.condition:
+        msgde = intr.get_message()
+
+        if msgde:
+            (msg, dt) = msgde
+            command = hex(msg[0])
+            notestat = msg[0]
+            notes = msg[1]
+            velocity = msg[2]
+
+            if command == '0x90':
+                texterON = serialConnection.getMotorNo(notes) + ',' + 'on' + '\n'
+                print(texterON + 'is sent')
+                ser.write(texterON.encode('ascii'))
+            elif command == '0x80':
+                texterOFF = serialConnection.getMotorNo(notes) + ',' + 'off'  + '\n'
+                print(texterOFF + 'is sent')
+                ser.write(texterOFF.encode('ascii'))
+            elif command == '0x90' and velocity == 0:
+                texterOFF = serialConnection.getMotorNo(notes) + ',' + 'off'  + '\n'
+                print(texterOFF + 'is sent')
+                ser.write(texterOFF.encode('ascii'))
+        else:
+            sleep(0.001)
+        
 
     # ser.close()

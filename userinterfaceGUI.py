@@ -137,17 +137,21 @@ class Ui_MainWindow(object):
         self.manualText.setText(_translate("MainWindow", "<html><head/><body><p align=\"center\">Mainkan angklung ini dengan menekan tuts <br/>pada keyboard yang telah disediakan</p></body></html>"))
         self.otomatisText.setText(_translate("MainWindow", "<html><head/><body><p align=\"center\">Ingin melihat angklung ini bermain secara otomatis? <br/>Pilihlah mode ini</p></body></html>"))
 
-class WorkerThread(QThread):
+# code to run midi manual
+class MidiManualThread(QThread):
+    finished = pyqtSignal()
+
+    def __init__(self):
+        super().__init__()
+        self.condition = True
+
     def run(self):
-        tt()
+        midireader.midiManual(self)
 
-def tt():
-    global condition
-    
-    while condition:
-        print('1')
-        QThread.msleep(100)  # Simulate some work
+    def stop(self):
+        self.condition = False
 
+# code to run midi otomatis
 class MidiPlayerThread(QThread):
     finished = pyqtSignal()
 
@@ -227,9 +231,13 @@ class Ui_modeManual(QWidget):
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
-        # run midireader_man
-        self.worker_thread = WorkerThread()
-        self.worker_thread.start()
+        self.midi_player_thread = None
+        self.start_midi()
+
+    def start_midi(self):
+        self.midi_player_thread = MidiManualThread()
+        self.midi_player_thread.finished.connect(self.on_midi_finished)
+        self.midi_player_thread.start()
 
     # return to main menu
     def backToMainMenu(self):
@@ -239,15 +247,15 @@ class Ui_modeManual(QWidget):
         self.mainMenu.show()
         MainWindow.hide()
 
-        global condition
-        condition = False
+        if self.midi_player_thread:
+            self.midi_player_thread.stop()
+            self.midi_player_thread.terminate()
+            self.midi_player_thread = None
+            print('player stopped')
 
-    def closeEvent(self, event):
-        # Ensure the worker thread is stopped when the application is closed
-        if self.worker_thread.isRunning():
-            self.worker_thread.quit()
-            self.worker_thread.wait()
-
+    def on_midi_finished(self):
+        self.midi_player_thread = None
+    
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
@@ -287,7 +295,7 @@ class Ui_modeOtomatis(object):
         self.toolButton.setObjectName("toolButton")
         self.formLayout_3.setWidget(0, QtWidgets.QFormLayout.FieldRole, self.toolButton)
         self.toolButton.setPopupMode(QtWidgets.QToolButton.InstantPopup)
-        # self.toolButton.setMenu(self.contextMenu)
+        self.toolButton.setMenu(self.show_context_menu)
 
         self.verticalLayout.addLayout(self.formLayout_3)
         self.modeOtomatisTitle = QtWidgets.QLabel(self.centralwidget)
@@ -359,14 +367,13 @@ class Ui_modeOtomatis(object):
                 self.listWidget.addItem(QtWidgets.QListWidgetItem(file))
         
         # scroll bar for list widget
-        # self.scrollBar = QtWidgets.QScrollBar(self.listWidget)
-        # self.listWidget.addScrollBarWidget(self.scrollBar, QtCore.Qt.AlignRight)
-        # self.listWidget.verticalScrollBar()
-        
+        scroll_area = QtWidgets.QScrollArea()
+        scroll_area.setWidget(self.listWidget)
+
+        # Set the QScrollArea as the central widget of the main window
+        self.setCentralWidget(scroll_area)
 
         # set value when user presses list widget
-        # self.listWidget.clicked.connect(lambda: self.listWidget.currentItem().text())
-        
         self.listWidget.itemClicked.connect(self.on_item_clicked)
         
         # add command for play button
@@ -492,7 +499,4 @@ if __name__ == "__main__":
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
     MainWindow.show()
-
-    condition = True
-    
     sys.exit(app.exec_())
