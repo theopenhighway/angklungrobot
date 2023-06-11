@@ -22,14 +22,7 @@ def getMotorNo(note_num):
     else:
         return str((note_num % 12)  + 1)
        
-def findTempo():
-    print()
-    
-def getFileName():
-    print()
-    
-def stopCode():
-    exit
+
 # print(getUSBPortName())
 
 # import serial

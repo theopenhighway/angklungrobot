@@ -110,6 +110,31 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
+        
+        self.context_menu = QMenu(MainWindow)
+        settingsAction = QAction("Action 1", MainWindow)
+        helpAction = QAction("Action 2", MainWindow)
+        aboutAction = QAction("Help", MainWindow)
+
+        self.context_menu.addAction(settingsAction)
+        self.context_menu.addAction(helpAction)
+        self.context_menu.addAction(aboutAction)
+
+        settingsAction.triggered.connect(self.handleSettingsAction)
+        helpAction.triggered.connect(self.handleHelpAction)
+        aboutAction.triggered.connect(self.handleAboutAction)
+
+        self.toolButton.setMenu(self.context_menu)
+        self.toolButton.setPopupMode(QtWidgets.QToolButton.InstantPopup)
+
+    def handleSettingsAction(self):
+        print("Action 1 triggered")
+
+    def handleHelpAction(self):
+        print("Action 2 triggered")
+
+    def handleAboutAction(self):
+        print("Action 3 triggered")
 
     def midiManual(self):
         self.modeManual = QtWidgets.QMainWindow()
@@ -123,7 +148,7 @@ class Ui_MainWindow(object):
         self.ui = Ui_modeOtomatis()
         self.ui.setupUi(self.modeOtomatis)
 
-        self.modeOtomatis.show()
+        self.modeOtomatis.showMaximized()
         MainWindow.hide()
 
     def retranslateUi(self, MainWindow):
@@ -244,7 +269,7 @@ class Ui_modeManual(QWidget):
         self.mainMenu = QtWidgets.QMainWindow()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self.mainMenu)
-        self.mainMenu.show()
+        self.mainMenu.showMaximized()
         MainWindow.hide()
 
         if self.midi_player_thread:
@@ -274,7 +299,7 @@ class Ui_modeOtomatis(object):
         self.centralwidget.setObjectName("centralwidget")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.centralwidget)
         self.verticalLayout.setObjectName("verticalLayout")
-        
+
         self.formLayout_3 = QtWidgets.QFormLayout()
         self.formLayout_3.setSizeConstraint(QtWidgets.QLayout.SetDefaultConstraint)
         self.formLayout_3.setObjectName("formLayout_3")
@@ -295,8 +320,7 @@ class Ui_modeOtomatis(object):
         self.toolButton.setObjectName("toolButton")
         self.formLayout_3.setWidget(0, QtWidgets.QFormLayout.FieldRole, self.toolButton)
         self.toolButton.setPopupMode(QtWidgets.QToolButton.InstantPopup)
-        self.toolButton.setMenu(self.show_context_menu)
-
+        
         self.verticalLayout.addLayout(self.formLayout_3)
         self.modeOtomatisTitle = QtWidgets.QLabel(self.centralwidget)
         font = QtGui.QFont()
@@ -314,8 +338,9 @@ class Ui_modeOtomatis(object):
         font.setWeight(75)
         self.label.setFont(font)
         self.label.setObjectName("label")
-       
         self.verticalLayout.addWidget(self.label, 0, QtCore.Qt.AlignHCenter|QtCore.Qt.AlignVCenter)
+        
+        # list widget
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
         self.listWidget = QtWidgets.QListWidget(self.centralwidget)
@@ -325,7 +350,7 @@ class Ui_modeOtomatis(object):
         
         self.horizontalLayout_11 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_11.setObjectName("horizontalLayout_11")
-        
+
         # play button
         self.playButton = QtWidgets.QPushButton(self.centralwidget)
         self.playButton.setObjectName("playButton")
@@ -343,7 +368,6 @@ class Ui_modeOtomatis(object):
         self.stopButton.setObjectName("stopButton")
         # self.horizontalLayout_11.addWidget(self.stopButton)
         self.verticalLayout.addWidget(self.stopButton)
-        
         
         MainWindow.setCentralWidget(self.centralwidget)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
@@ -366,13 +390,15 @@ class Ui_modeOtomatis(object):
             if os.path.isfile(os.path.join(dir_path, file)):
                 self.listWidget.addItem(QtWidgets.QListWidgetItem(file))
         
+
         # scroll bar for list widget
-        scroll_area = QtWidgets.QScrollArea()
-        scroll_area.setWidget(self.listWidget)
+        scroll_area = QtWidgets.QScrollArea(self.centralwidget)  # Create a scroll area with central widget as parent
+        scroll_area.setWidgetResizable(True)  # Allow the widget to resize with the scroll area
+        scroll_area.setWidget(self.listWidget)  # Set the list widget as the scroll area's widget
 
-        # Set the QScrollArea as the central widget of the main window
-        self.setCentralWidget(scroll_area)
-
+        self.verticalLayout.addWidget(scroll_area)  # Add the scroll area to the layout
+        MainWindow.setCentralWidget(self.centralwidget)  
+        
         # set value when user presses list widget
         self.listWidget.itemClicked.connect(self.on_item_clicked)
         
@@ -386,6 +412,8 @@ class Ui_modeOtomatis(object):
         # stop midi
         self.stopButton.clicked.connect(self.stop_midi)
         self.stopButton.setEnabled(False)
+
+        # context menu when toolbar is pressed
 
     def on_item_clicked(self, item):
         self.selected_item = item.text()
@@ -424,32 +452,6 @@ class Ui_modeOtomatis(object):
         self.pauseButton.setText('Pause')
         self.stopButton.setEnabled(False)
 
-    # context menu when toolbar is pressed
-    def show_context_menu(self):
-        context_menu = QMenu(self)
-        settingsMenu = QAction("Settings", self)
-        statusMenu = QAction("Status: ", self)
-        helpMenu = QAction("Help", self)
-
-        context_menu.addAction(settingsMenu)
-        context_menu.addAction(statusMenu)
-        context_menu.addAction(helpMenu)
-
-        settingsMenu.triggered.connect(self.handle_action1)
-        statusMenu.triggered.connect(self.handle_action2)
-        helpMenu.triggered.connect(self.handle_action3)
-
-        context_menu.exec_(self.button.mapToGlobal(self.button.rect().bottomLeft()))
-
-    def handle_action1(self):
-        print("Action 1 triggered")
-
-    def handle_action2(self):
-        print("Action 2 triggered")
-
-    def handle_action3(self):
-        print("Action 3 triggered")
-
     def hideMidiOtomatis(self):
         self.modeOtomatis = QtWidgets.QMainWindow()
         self.ui = Ui_modeOtomatis()
@@ -461,7 +463,7 @@ class Ui_modeOtomatis(object):
         self.mainMenu = QtWidgets.QMainWindow()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self.mainMenu)
-        self.mainMenu.show()
+        self.mainMenu.showMaximized()
         MainWindow.hide()
         self.hideMidiOtomatis()
 
@@ -498,5 +500,5 @@ if __name__ == "__main__":
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
-    MainWindow.show()
+    MainWindow.showMaximized()
     sys.exit(app.exec_())
