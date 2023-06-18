@@ -1,13 +1,54 @@
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtCore, QtGui, QtWidgets, QtSerialPort
 from PyQt5.QtWidgets import QMenu, QMessageBox, QWidget, QAction
 from PyQt5.QtCore import QThread, pyqtSignal
-from PyQt5.QtGui import QIcon
-import serial
+from PyQt5.QtGui import QIcon, QPixmap
 import midireader
 
+# assets
 HEIGHT = 720
 WIDTH = 1280
+SETTINGS_ICON = 'gui_asset\\settings.png'
 
+class stockImages:
+    def loadImage(imagePath):
+        pixMap = QPixmap(imagePath)
+        return QIcon(pixMap)
+
+# code to run midi manual
+class MidiManualThread(QThread):
+    finished = pyqtSignal()
+
+    def __init__(self):
+        super().__init__()
+        self.condition = True
+
+    def run(self):
+        midireader.midiManual(self)
+
+    def stop(self):
+        self.condition = False
+
+# code to run midi otomatis
+class MidiPlayerThread(QThread):
+    finished = pyqtSignal()
+
+    def __init__(self, song_title):
+        super().__init__()
+        self.song_title = song_title
+        self.paused = False
+
+    def run(self):
+        midireader.midiOtomatis(self.song_title, self)
+
+    def pause(self):
+        self.paused = True
+
+    def resume(self):
+        self.paused = False
+
+    def is_paused(self):
+        return self.paused
+    
 # main menu page
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -23,6 +64,7 @@ class Ui_MainWindow(object):
         # settings button
         self.toolButton = QtWidgets.QToolButton(self.centralwidget)
         self.toolButton.setObjectName("toolButton")
+        self.toolButton.setIcon(stockImages.loadImage(SETTINGS_ICON)) 
         self.verticalLayout.addWidget(self.toolButton, 0, QtCore.Qt.AlignLeft)
 
         self.verticalLayout_2 = QtWidgets.QVBoxLayout()
@@ -162,41 +204,6 @@ class Ui_MainWindow(object):
         self.manualText.setText(_translate("MainWindow", "<html><head/><body><p align=\"center\">Mainkan angklung ini dengan menekan tuts <br/>pada keyboard yang telah disediakan</p></body></html>"))
         self.otomatisText.setText(_translate("MainWindow", "<html><head/><body><p align=\"center\">Ingin melihat angklung ini bermain secara otomatis? <br/>Pilihlah mode ini</p></body></html>"))
 
-# code to run midi manual
-class MidiManualThread(QThread):
-    finished = pyqtSignal()
-
-    def __init__(self):
-        super().__init__()
-        self.condition = True
-
-    def run(self):
-        midireader.midiManual(self)
-
-    def stop(self):
-        self.condition = False
-
-# code to run midi otomatis
-class MidiPlayerThread(QThread):
-    finished = pyqtSignal()
-
-    def __init__(self, song_title):
-        super().__init__()
-        self.song_title = song_title
-        self.paused = False
-
-    def run(self):
-        midireader.midiOtomatis(self.song_title, self)
-
-    def pause(self):
-        self.paused = True
-
-    def resume(self):
-        self.paused = False
-
-    def is_paused(self):
-        return self.paused
-
 # mode manual page
 class Ui_modeManual(QWidget):
     def setupUi(self, MainWindow):
@@ -223,6 +230,7 @@ class Ui_modeManual(QWidget):
         # settings button
         self.settingsButton = QtWidgets.QToolButton(self.centralwidget)
         self.settingsButton.setObjectName("settingsButton")
+        self.settingsButton.setIcon(stockImages.loadImage(SETTINGS_ICON)) 
         self.formLayout.setWidget(0, QtWidgets.QFormLayout.FieldRole, self.settingsButton)
         
         self.verticalLayout_3.addLayout(self.formLayout)
@@ -318,6 +326,7 @@ class Ui_modeOtomatis(object):
         # settings menu
         self.toolButton = QtWidgets.QToolButton(self.centralwidget)
         self.toolButton.setObjectName("toolButton")
+        self.toolButton.setIcon(stockImages.loadImage(SETTINGS_ICON)) 
         self.formLayout_3.setWidget(0, QtWidgets.QFormLayout.FieldRole, self.toolButton)
         self.toolButton.setPopupMode(QtWidgets.QToolButton.InstantPopup)
         
@@ -466,21 +475,6 @@ class Ui_modeOtomatis(object):
         self.mainMenu.showMaximized()
         MainWindow.hide()
         self.hideMidiOtomatis()
-
-    # if serial connection failed, then a pop up menu will show up
-    def popUpUSB(self):
-        msg = QMessageBox()
-        msg.setWindowTitle("Angklung Tidak Terhubung")
-        msg.setText("Sambungkan kembali koneksi USB Raspberry Pi dengan mikrokontroller.")
-        msg.setIcon(QMessageBox.Critical)
-        msg.setStandardButtons(QMessageBox.Retry|QMessageBox.Ignore)
-        msg.buttonClicked.connect(self.popUpButton)
-    
-    def popUpButton(self, i):
-        if i.text() == 'Retry':
-            print()
-        elif i.text == 'Xancel':
-            print()
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate

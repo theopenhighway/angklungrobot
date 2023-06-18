@@ -4,7 +4,18 @@ from time import sleep
 import serial
 import serialConnection
 import rtmidi
-from PyQt5.QtCore import QThread
+from PyQt5.QtCore import QThread, QTimer
+from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel
+import os
+
+def check_serial_connection(self):
+    if self.serial is None or not self.serial.is_open:
+        try:
+            self.serial = serial.Serial('COM3', 9600)  # Replace 'COM3' with your microcontroller's port
+            self.label.setText("Connected")
+        except serial.SerialException:
+            self.serial = None
+            self.label.setText("Disconnected")
 
 def midiOtomatis(songTitleX, thread):
     # ser = serial.Serial(serialConnection.getUSBPortName(),31250, timeout=1)
@@ -72,8 +83,7 @@ def midiOtomatis(songTitleX, thread):
 
             if thread.isInterruptionRequested():
                 return
-
-                    
+          
 def midiManual(thread):
     ser = serial.Serial('COM3', 31250, timeout=1)
     ser.flush()
@@ -108,5 +118,9 @@ def midiManual(thread):
         else:
             sleep(0.001)
         
+        self.serial = None
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.check_serial_connection)
+        self.timer.start(1000)  
 
     # ser.close()
