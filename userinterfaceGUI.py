@@ -1,7 +1,8 @@
-from PyQt5 import QtCore, QtGui, QtWidgets, QtSerialPort
+from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMenu, QMessageBox, QWidget, QAction
-from PyQt5.QtCore import QThread, pyqtSignal
+from PyQt5.QtCore import QThread, pyqtSignal, QUrl, Qt
 from PyQt5.QtGui import QIcon, QPixmap
+from PyQt5.QtWebEngineWidgets import QWebEngineView
 import midireader
 
 # assets
@@ -153,27 +154,32 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         
+        # settings menu
         self.context_menu = QMenu(MainWindow)
-        settingsAction = QAction("Action 1", MainWindow)
-        helpAction = QAction("Action 2", MainWindow)
-        aboutAction = QAction("Help", MainWindow)
+        settingsAction = QAction("Settings", MainWindow)
+        documentationAction = QAction("Documentation", MainWindow)
+        aboutAction = QAction("About", MainWindow)
 
         self.context_menu.addAction(settingsAction)
-        self.context_menu.addAction(helpAction)
+        self.context_menu.addAction(documentationAction)
         self.context_menu.addAction(aboutAction)
 
         settingsAction.triggered.connect(self.handleSettingsAction)
-        helpAction.triggered.connect(self.handleHelpAction)
+        documentationAction.triggered.connect(self.handleDocsAction)
         aboutAction.triggered.connect(self.handleAboutAction)
-
+        self.webView = None
         self.toolButton.setMenu(self.context_menu)
         self.toolButton.setPopupMode(QtWidgets.QToolButton.InstantPopup)
 
     def handleSettingsAction(self):
         print("Action 1 triggered")
 
-    def handleHelpAction(self):
-        print("Action 2 triggered")
+    def handleDocsAction(self):
+        url = "https://www.google.com"  # Replace with your desired link
+        webView = QWebEngineView()
+        self.webView.setAttribute(Qt.WA_DeleteOnClose, False)  
+        webView.load(QUrl(url))
+        webView.show()
 
     def handleAboutAction(self):
         print("Action 3 triggered")
@@ -441,9 +447,11 @@ class Ui_modeOtomatis(object):
         if self.midi_player_thread and not self.midi_player_thread.is_paused():
             self.midi_player_thread.pause()
             self.pauseButton.setText('Resume')
+            print('player paused')
         elif self.midi_player_thread:
             self.midi_player_thread.resume()
             self.pauseButton.setText('Pause')
+            print('player resumed')
 
     def stop_midi(self):
         if self.midi_player_thread:
@@ -453,6 +461,7 @@ class Ui_modeOtomatis(object):
         self.pauseButton.setEnabled(False)
         self.pauseButton.setText('Pause')
         self.stopButton.setEnabled(False)
+        print('player stopped')
 
     def on_midi_finished(self):
         self.midi_player_thread = None

@@ -30,15 +30,15 @@ def midiManual():
             velocity = msg[2]
 
             if command == '0x90':
-                texterON = serialConnection.getMotorNo(msg.note) + ',' + 'on' + '\n'
+                texterON = serialConnection.getMotorNo(notes) + ',' + 'on' + '\n'
                 print(texterON + 'is sent')
                 ser.write(texterON.encode('ascii'))
             elif command == '0x80':
-                texterOFF = serialConnection.getMotorNo(msg.note) + ',' + 'off'  + '\n'
+                texterOFF = serialConnection.getMotorNo(notes) + ',' + 'off'  + '\n'
                 print(texterOFF + 'is sent')
                 ser.write(texterOFF.encode('ascii'))
             elif command == '0x90' and velocity == 0:
-                texterOFF = serialConnection.getMotorNo(msg.note) + ',' + 'off'  + '\n'
+                texterOFF = serialConnection.getMotorNo(notes) + ',' + 'off'  + '\n'
                 print(texterOFF + 'is sent')
                 ser.write(texterOFF.encode('ascii'))           
         else: 

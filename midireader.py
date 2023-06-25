@@ -19,10 +19,19 @@ def check_serial_connection(self):
 
 def midiOtomatis(songTitleX, thread):
     # ser = serial.Serial(serialConnection.getUSBPortName(),31250, timeout=1)
-    ser = serial.Serial('COM3',31250,timeout=1)
+    # ser = serial.Serial('COM3',31250,timeout=1)
+
+    #linux ver
+    # ser = serial.Serial('/dev/ttyACM0',31250,timeout=1)
+    # directo = 'midi_files//'
+
+    # windows ver
+    ser = serial.Serial('COM4',31250,timeout=1)
+    directo = 'midi_files\\'
+    
     ser.flush()
 
-    directo = 'midi_files\\'
+    
     #songTitle = 'twinkle-twinkle-little-star.mid'
     songTitle = songTitleX
     mid = MidiFile(directo + songTitle)
@@ -58,7 +67,6 @@ def midiOtomatis(songTitleX, thread):
                 
                 else:
                     dt = (mido.tick2second(msg.time, ticksPerBeat, tempo))
-                    # intDT = str(int(dt))
                     
                     if msg.type == 'note_on' and msg.velocity > 0:
                         texterON = serialConnection.getMotorNo(msg.note) + ',' + 'on' + '\n'
@@ -85,7 +93,12 @@ def midiOtomatis(songTitleX, thread):
                 return
           
 def midiManual(thread):
-    ser = serial.Serial('COM3', 31250, timeout=1)
+
+    #linux ver
+    # ser = serial.Serial('/dev/ttyACM0',31250,timeout=1)
+
+    # windows ver
+    ser = serial.Serial('COM4',31250,timeout=1)
     ser.flush()
 
     intr = rtmidi.MidiIn()
@@ -118,9 +131,9 @@ def midiManual(thread):
         else:
             sleep(0.001)
         
-        self.serial = None
-        self.timer = QTimer()
-        self.timer.timeout.connect(self.check_serial_connection)
-        self.timer.start(1000)  
+        # thread.serial = None
+        # thread.timer = QTimer()
+        # thread.timer.timeout.connect(self.check_serial_connection)
+        # thread.timer.start(1000)  
 
     # ser.close()
