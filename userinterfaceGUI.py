@@ -1,8 +1,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMenu, QMessageBox, QWidget, QAction
 from PyQt5.QtCore import QThread, pyqtSignal, QUrl, Qt
-from PyQt5.QtGui import QIcon, QPixmap
-from PyQt5.QtWebEngineWidgets import QWebEngineView
+from PyQt5.QtGui import QIcon, QPixmap, QDesktopServices
 import midireader
 
 # assets
@@ -121,25 +120,25 @@ class Ui_MainWindow(object):
         self.horizontalLayout_3.setObjectName("horizontalLayout_3")
         self.modeManual.clicked.connect(self.midiManual)
         
-        self.manualText = QtWidgets.QLabel(self.centralwidget)
-        font = QtGui.QFont()
-        font.setPointSize(12)
-        self.manualText.setFont(font)
-        self.manualText.setObjectName("manualText")
-        self.horizontalLayout_3.addWidget(self.manualText)
-        
         self.otomatisText = QtWidgets.QLabel(self.centralwidget)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Minimum)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.otomatisText.sizePolicy().hasHeightForWidth())
-        self.otomatisText.setSizePolicy(sizePolicy)
         font = QtGui.QFont()
         font.setPointSize(12)
         self.otomatisText.setFont(font)
-        self.otomatisText.setTabletTracking(False)
         self.otomatisText.setObjectName("otomatisText")
         self.horizontalLayout_3.addWidget(self.otomatisText)
+        
+        self.manualText = QtWidgets.QLabel(self.centralwidget)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Minimum)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.manualText.sizePolicy().hasHeightForWidth())
+        self.manualText.setSizePolicy(sizePolicy)
+        font = QtGui.QFont()
+        font.setPointSize(12)
+        self.manualText.setFont(font)
+        self.manualText.setTabletTracking(False)
+        self.manualText.setObjectName("manualText")
+        self.horizontalLayout_3.addWidget(self.manualText)
         self.verticalLayout.addLayout(self.horizontalLayout_3)
         MainWindow.setCentralWidget(self.centralwidget)
         
@@ -164,25 +163,12 @@ class Ui_MainWindow(object):
         self.context_menu.addAction(documentationAction)
         self.context_menu.addAction(aboutAction)
 
-        settingsAction.triggered.connect(self.handleSettingsAction)
-        documentationAction.triggered.connect(self.handleDocsAction)
-        aboutAction.triggered.connect(self.handleAboutAction)
+        settingsAction.triggered.connect(universalFunction.handleSettingsAction)
+        documentationAction.triggered.connect(universalFunction.handleDocsAction)
+        aboutAction.triggered.connect(universalFunction.handleAboutAction)
         self.webView = None
         self.toolButton.setMenu(self.context_menu)
         self.toolButton.setPopupMode(QtWidgets.QToolButton.InstantPopup)
-
-    def handleSettingsAction(self):
-        print("Action 1 triggered")
-
-    def handleDocsAction(self):
-        url = "https://www.google.com"  # Replace with your desired link
-        webView = QWebEngineView()
-        self.webView.setAttribute(Qt.WA_DeleteOnClose, False)  
-        webView.load(QUrl(url))
-        webView.show()
-
-    def handleAboutAction(self):
-        print("Action 3 triggered")
 
     def midiManual(self):
         self.modeManual = QtWidgets.QMainWindow()
@@ -201,14 +187,14 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "angklungrobot"))
         self.toolButton.setText(_translate("MainWindow", "..."))
-        self.welcomeText.setText(_translate("MainWindow", "SELAMAT DATANG"))
-        self.instructionText.setText(_translate("MainWindow", "Silahkan pilih mode yang ingin digunakan"))
-        self.modeOtomatis.setText(_translate("MainWindow", "Mode Otomatis"))
-        self.modeManual.setText(_translate("MainWindow", "Mode Manual"))
+        self.welcomeText.setText(_translate("MainWindow", "WELCOME"))
+        self.instructionText.setText(_translate("MainWindow", "Please select the desired mode."))
+        self.modeOtomatis.setText(_translate("MainWindow", "Automatic Mode"))
+        self.modeManual.setText(_translate("MainWindow", "Manual Mode"))
         self.manualText.setText(_translate("MainWindow", "<html><head/><body><p align=\"center\">Mainkan angklung ini dengan menekan tuts <br/>pada keyboard yang telah disediakan</p></body></html>"))
-        self.otomatisText.setText(_translate("MainWindow", "<html><head/><body><p align=\"center\">Ingin melihat angklung ini bermain secara otomatis? <br/>Pilihlah mode ini</p></body></html>"))
+        self.otomatisText.setText(_translate("MainWindow", "<html><head/><body><p align=\"center\"> Let this angklung play on its own. </p></body></html>"))
 
 # mode manual page
 class Ui_modeManual(QWidget):
@@ -273,6 +259,20 @@ class Ui_modeManual(QWidget):
         self.midi_player_thread = None
         self.start_midi()
 
+        # settings menu
+        self.context_menu = QMenu(MainWindow)
+        settingsAction = QAction("Settings", MainWindow)
+        documentationAction = QAction("Documentation", MainWindow)
+        aboutAction = QAction("About", MainWindow)
+
+        self.context_menu.addAction(settingsAction)
+        self.context_menu.addAction(documentationAction)
+        self.context_menu.addAction(aboutAction)
+
+        settingsAction.triggered.connect(universalFunction.handleSettingsAction)
+        documentationAction.triggered.connect(universalFunction.handleDocsAction)
+        aboutAction.triggered.connect(universalFunction.handleAboutAction)
+
     def start_midi(self):
         self.midi_player_thread = MidiManualThread()
         self.midi_player_thread.finished.connect(self.on_midi_finished)
@@ -300,7 +300,7 @@ class Ui_modeManual(QWidget):
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.backButton.setText(_translate("MainWindow", "Back"))
         self.settingsButton.setText(_translate("MainWindow", "..."))
-        self.modeManualTitle.setText(_translate("MainWindow", "MODE MANUAL"))
+        self.modeManualTitle.setText(_translate("MainWindow", "MANUAL MODE"))
         self.manualInst.setText(_translate("MainWindow", "<html><head/><body><p align=\"center\"><span style=\" font-size:14pt;\">Silahkan tekan tuts keyboard yang disediakan untuk <br/>berinteraksi langsung dengan angklung ini!</span></p></body></html>"))
 
 # mode otomatis page
@@ -490,13 +490,30 @@ class Ui_modeOtomatis(object):
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.backButton.setText(_translate("MainWindow", "Back"))
         self.toolButton.setText(_translate("MainWindow", "..."))
-        self.modeOtomatisTitle.setText(_translate("MainWindow", "MODE OTOMATIS"))
-        self.label.setText(_translate("MainWindow", "Pilihan Lagu"))
+        self.modeOtomatisTitle.setText(_translate("MainWindow", "AUTOMATIC MODE"))
+        self.label.setText(_translate("MainWindow", "Song List"))
         self.playButton.setText(_translate("MainWindow", "Play"))
         self.pauseButton.setText(_translate("MainWindow", "Pause"))
         self.stopButton.setText(_translate("MainWindow", "Stop"))
 
+class universalFunction:
+    # settings object
+    def handleSettingsAction(self):
+        print("Action 1 triggered")
     
+    def handleDocsAction(self):
+        url = QUrl("https://github.com/theopenhighway") 
+        QDesktopServices.openUrl(url)
+
+    def handleAboutAction(self):
+        msg_box = QMessageBox()
+        msg_box.setWindowTitle("About")
+        msg_box.setText("angklungrobot 2023 <br> version 1.0")
+        msg_box.setIcon(QMessageBox.Information)
+        msg_box.exec_()
+        # print("Action 3 triggered")
+    
+
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)

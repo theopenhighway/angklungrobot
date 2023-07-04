@@ -2,11 +2,37 @@ from mido import MidiFile
 import mido
 from time import sleep
 import serial
-import serialConnection
 import rtmidi
 from PyQt5.QtCore import QThread, QTimer
 from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel
-import os
+from serial.tools import list_ports
+
+def serialDisconnect():
+    pass
+
+def controllerDisconnect():
+    pass
+
+# find USB port address
+def getUSBPortName():
+    enmu_ports = enumerate(list_ports.comports())
+    port = ""
+        
+    for n, (p, descriptor, hid) in enmu_ports:
+        # print(p,descriptor, hid)
+        # print(descriptor)
+        if "USB-SERIAL CH340 (COM4)" or "Standard Serial over Bluetooth link (COM8)" in descriptor:
+            port = p.split()
+            return str(port[0])
+
+#converts note number to motor no (e.g. C3 - 48 = Motor 1)
+def getMotorNo(note_num):
+    if note_num >= 72:
+        return str(((note_num % 12) + 24) + 1)
+    elif note_num >= 60:
+        return str(((note_num % 12) + 12) + 1)
+    else:
+        return str((note_num % 12)  + 1)
 
 def check_serial_connection(self):
     if self.serial is None or not self.serial.is_open:
@@ -17,7 +43,7 @@ def check_serial_connection(self):
             self.serial = None
             self.label.setText("Disconnected")
 
-def midiOtomatis(songTitleX, thread):
+def midiOtomatis(songTitleX, thread, self):
     # ser = serial.Serial(serialConnection.getUSBPortName(),31250, timeout=1)
     # ser = serial.Serial('COM3',31250,timeout=1)
 
@@ -26,7 +52,7 @@ def midiOtomatis(songTitleX, thread):
     # directo = 'midi_files//'
 
     # windows ver
-    ser = serial.Serial('COM4',31250,timeout=1)
+    ser = serial.Serial('COM5',31250,timeout=1)
     directo = 'midi_files\\'
     
     ser.flush()
@@ -37,60 +63,46 @@ def midiOtomatis(songTitleX, thread):
     mid = MidiFile(directo + songTitle)
 
 
-    # print(mid.length)
     ticksPerBeat = mid.ticks_per_beat    
     dt = 0      
-    # print(ticksPerBeat)
+    tempo = 0
 
     def setTempo(msg):
-        if msg.tempo != None:
+        if msg.tempo == None:
             return 500000
         else:
             return msg.tempo
 
     sleep(2)
 
-    for i, track in enumerate(mid.tracks):
-        # print('Track {}: {}'.format(i, track.name))
-        for msg in track:
 
-            if msg.is_meta and msg.type == 'set_tempo':
-                # tempo: microsecond per quarter note
-                # default tempo: 120 BPM (500000 microsecond per quarter note)
-                # default time signature: 4/4
-                tempo = msg.tempo
-                
-            elif not msg.is_meta and (msg.type != 'control_change' and msg.type != 'program_change' and msg.type != 'aftertouch' and msg.type != 'pitchwheel' and msg.type != 'sysex'):
-                # skip if note number is not within the required range
-                if msg.note < 48 and msg.note > 72:
-                    pass
-                
-                else:
-                    dt = (mido.tick2second(msg.time, ticksPerBeat, tempo))
+
+    for msg in mid:
+        sleep(msg.time)
+
+        if not msg.is_meta and (msg.type != 'control_change' and msg.type != 'program_change' and msg.type != 'aftertouch' and msg.type != 'pitchwheel' and msg.type != 'sysex'):
+            if msg.type == 'note_on' and msg.velocity > 0:
+                texterON =  getMotorNo(msg.note) + ',' + 'on' + '\n'
+                print(texterON) 
+                ser.write(texterON.encode('ascii'))
                     
-                    if msg.type == 'note_on' and msg.velocity > 0:
-                        texterON = serialConnection.getMotorNo(msg.note) + ',' + 'on' + '\n'
-                        print(texterON)
-                        ser.write(texterON.encode('ascii'))
-                        
-                    elif msg.type == 'note_on' and msg.velocity == 0:
-                        texterOFF = serialConnection.getMotorNo(msg.note) + ',' + 'off' +  '\n'
-                        print(texterOFF)
-                        ser.write(texterOFF.encode('ascii'))
+            elif msg.type == 'note_on' and msg.velocity == 0:
+                texterOFF =  getMotorNo(msg.note) + ',' + 'off' + '\n'
+                print(texterOFF)
+                ser.write(texterOFF.encode('ascii'))
 
-                    elif msg.type == 'note_off':
-                        texterOFF = serialConnection.getMotorNo(msg.note) + ',' + 'off' + '\n'
-                        print(texterOFF)
-                        ser.write(texterOFF.encode('ascii'))
-                    
-                    sleep(dt)
+            elif msg.type == 'note_off':
+                texterOFF =  getMotorNo(msg.note) + ',' + 'off' + '\n'
+                print(texterOFF)
+                ser.write(texterOFF.encode('ascii'))
+                
 
-            if thread.is_paused():
-                while thread.is_paused():
-                    QThread.msleep(100)  # Sleep to reduce CPU usage while paused
+        if thread.is_paused():
+            while thread.is_paused():
+                QThread.msleep(100)  # Sleep to reduce CPU usage while paused
 
-            if thread.isInterruptionRequested():
-                return
+        if thread.isInterruptionRequested():
+            return
           
 def midiManual(thread):
 
@@ -98,7 +110,7 @@ def midiManual(thread):
     # ser = serial.Serial('/dev/ttyACM0',31250,timeout=1)
 
     # windows ver
-    ser = serial.Serial('COM4',31250,timeout=1)
+    ser = serial.Serial('COM5',31250,timeout=1)
     ser.flush()
 
     intr = rtmidi.MidiIn()
@@ -117,15 +129,15 @@ def midiManual(thread):
             velocity = msg[2]
 
             if command == '0x90':
-                texterON = serialConnection.getMotorNo(notes) + ',' + 'on' + '\n'
+                texterON = getMotorNo(notes) + ',' + 'on' + '\n'
                 print(texterON + 'is sent')
                 ser.write(texterON.encode('ascii'))
             elif command == '0x80':
-                texterOFF = serialConnection.getMotorNo(notes) + ',' + 'off'  + '\n'
+                texterOFF = getMotorNo(notes) + ',' + 'off'  + '\n'
                 print(texterOFF + 'is sent')
                 ser.write(texterOFF.encode('ascii'))
             elif command == '0x90' and velocity == 0:
-                texterOFF = serialConnection.getMotorNo(notes) + ',' + 'off'  + '\n'
+                texterOFF = getMotorNo(notes) + ',' + 'off'  + '\n'
                 print(texterOFF + 'is sent')
                 ser.write(texterOFF.encode('ascii'))
         else:
