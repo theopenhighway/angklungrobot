@@ -126,31 +126,24 @@ def printMidiEvent(z):
             return msg.tempo
 
     mid = MidiFile(directo + songTitle)
-    for i, track in enumerate(mid.tracks):
-        # print('Track {}: {}'.format(i, track.name))
-        for msg in track:
-            if msg.is_meta and msg.type == 'set_tempo':
-                # tempo: microsecond per quarter note
-                # default tempo: 120 BPM (500000 microsecond per quarter note)
-                # default time signature: 4/4
-                tempo = setTempo(msg)
-                print(tempo)
-            else:
-                print(msg)
+    for msg in mid:
+        sleep(msg.time)
+        print(msg, msg.time)
 
 def midiPlayback(x):
     def getMotorNo(note_num):
-        if note_num >= 72:
+        if note_num == 72:
             return str(((note_num % 12) + 24) + 1)
         elif note_num >= 60:
             return str(((note_num % 12) + 12) + 1)
         elif note_num >=48:
             return str((note_num % 12)  + 1)
         else:
-            return 0
+            return str(0)
        
     ser = serial.Serial('COM5',31250,timeout=1)
     ser.flush()
+    sleep(2)
     songTitle = x
     directo = 'midi_files//'
     mid = MidiFile(directo + songTitle)
@@ -179,7 +172,7 @@ def midiPlayback(x):
     ser.close()           
 
 if __name__ == "__main__":
-    midiPlayback('Pengujian Chord Mayor.mid')
+    midiPlayback('twinkle-twinkle-little-star.mid')
     # midiOtomatis('Pengujian Chord Mayor.mid')
-    #printMidiEvent('Pengujian Chord Mayor.mid')
+    # printMidiEvent('bohemian-rhapsody.mid')
     
