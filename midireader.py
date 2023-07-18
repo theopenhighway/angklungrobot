@@ -6,6 +6,14 @@ import rtmidi
 from PyQt5.QtCore import QThread
 from serial.tools import list_ports
 
+
+portNameWindows = 'COM3'
+portNamwLinux = '/dev/ttyACM0'
+
+def openSerialPort(name):
+    ser = serial.Serial(name,31250,timeout=1)
+    return ser
+
 # find USB port address
 def getUSBPortName():
     enmu_ports = enumerate(list_ports.comports())
@@ -35,11 +43,11 @@ def midiOtomatis(songTitleX, thread):
     # ser = serial.Serial('COM3',31250,timeout=1)
 
     #linux ver
-    # ser = serial.Serial('/dev/ttyACM0',31250,timeout=1)
+    # ser = serial.Serial(portNameLinux,31250,timeout=1)
     # directo = 'midi_files//'
 
     # windows ver
-    ser = serial.Serial('COM5',31250,timeout=1)
+    ser = openSerialPort(portNameWindows)
     directo = 'midi_files\\'
     
     ser.flush()
@@ -80,10 +88,10 @@ def midiOtomatis(songTitleX, thread):
           
 def midiManual(thread):
     # windows ver
-    ser = serial.Serial('COM5',31250,timeout=1)
+    ser = openSerialPort(portNameWindows)
 
     #linux ver
-    # ser = serial.Serial('/dev/ttyACM0',31250,timeout=1)
+    # ser = serial.Serial(portNamwLinux,31250,timeout=1)
     ser.flush()
 
     intr = rtmidi.MidiIn()
