@@ -6,9 +6,8 @@ import rtmidi
 from PyQt5.QtCore import QThread
 from serial.tools import list_ports
 
+portName = 'COM3'
 
-portNameWindows = 'COM3'
-portNamwLinux = '/dev/ttyACM0'
 
 def openSerialPort(name):
     ser = serial.Serial(name,31250,timeout=1)
@@ -43,11 +42,11 @@ def midiOtomatis(songTitleX, thread):
     # ser = serial.Serial('COM3',31250,timeout=1)
 
     #linux ver
-    # ser = serial.Serial(portNameLinux,31250,timeout=1)
+    # ser = openSerialPort(portNameWindows)
     # directo = 'midi_files//'
 
     # windows ver
-    ser = openSerialPort(portNameWindows)
+    ser = openSerialPort(portName)
     directo = 'midi_files\\'
     
     ser.flush()
@@ -88,7 +87,7 @@ def midiOtomatis(songTitleX, thread):
           
 def midiManual(thread):
     # windows ver
-    ser = openSerialPort(portNameWindows)
+    ser = openSerialPort(portName)
 
     #linux ver
     # ser = serial.Serial(portNamwLinux,31250,timeout=1)

@@ -1,13 +1,18 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMenu, QMessageBox, QWidget, QAction
-from PyQt5.QtCore import QThread, pyqtSignal, QUrl, Qt
+from PyQt5.QtCore import QThread, pyqtSignal, QUrl
 from PyQt5.QtGui import QIcon, QPixmap, QDesktopServices
 import midireader
+from time import sleep
+import serial.tools.list_ports
 
 # assets
 HEIGHT = 720
 WIDTH = 1280
 SETTINGS_ICON = 'gui_asset\\settings.png'
+
+serialPort = midireader.portName
+
 
 class stockImages:
     def loadImage(imagePath):
@@ -49,13 +54,15 @@ class MidiPlayerThread(QThread):
     def is_paused(self):
         return self.paused
     
+    def stop(self):
+        self.stop_midi
+
 # main menu page
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(WIDTH, HEIGHT)
         MainWindow.setWindowTitle("Stop Function Example")
-        # QMainWindow.setWindowTitle("AngklungRobot")
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.centralwidget)
@@ -190,10 +197,10 @@ class Ui_MainWindow(object):
         MainWindow.setWindowTitle(_translate("MainWindow", "angklungrobot"))
         self.toolButton.setText(_translate("MainWindow", "..."))
         self.welcomeText.setText(_translate("MainWindow", "WELCOME"))
-        self.instructionText.setText(_translate("MainWindow", "Please select the desired mode."))
+        self.instructionText.setText(_translate("MainWindow", "Select the desired mode."))
         self.modeOtomatis.setText(_translate("MainWindow", "Automatic Mode"))
         self.modeManual.setText(_translate("MainWindow", "Manual Mode"))
-        self.manualText.setText(_translate("MainWindow", "<html><head/><body><p align=\"center\">Mainkan angklung ini dengan menekan tuts <br/>pada keyboard yang telah disediakan</p></body></html>"))
+        self.manualText.setText(_translate("MainWindow", "<html><head/><body><p align=\"center\">Play the keyboard to interact.</p></body></html>"))
         self.otomatisText.setText(_translate("MainWindow", "<html><head/><body><p align=\"center\"> Let this angklung play on its own. </p></body></html>"))
 
 # mode manual page
@@ -272,6 +279,11 @@ class Ui_modeManual(QWidget):
         settingsAction.triggered.connect(universalFunction.handleSettingsAction)
         documentationAction.triggered.connect(universalFunction.handleDocsAction)
         aboutAction.triggered.connect(universalFunction.handleAboutAction)
+    
+        self.webView = None
+        self.settingsButton.setMenu(self.context_menu)
+        self.settingsButton.setPopupMode(QtWidgets.QToolButton.InstantPopup)
+
 
     def start_midi(self):
         self.midi_player_thread = MidiManualThread()
@@ -284,7 +296,7 @@ class Ui_modeManual(QWidget):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self.mainMenu)
         self.mainMenu.showMaximized()
-        MainWindow.hide()
+        MainWindow.close()
 
         if self.midi_player_thread:
             self.midi_player_thread.stop()
@@ -429,6 +441,22 @@ class Ui_modeOtomatis(object):
         self.stopButton.setEnabled(False)
 
         # context menu when toolbar is pressed
+        self.context_menu = QMenu(MainWindow)
+        settingsAction = QAction("Settings", MainWindow)
+        documentationAction = QAction("Documentation", MainWindow)
+        aboutAction = QAction("About", MainWindow)
+
+        self.context_menu.addAction(settingsAction)
+        self.context_menu.addAction(documentationAction)
+        self.context_menu.addAction(aboutAction)
+
+        settingsAction.triggered.connect(universalFunction.handleSettingsAction)
+        documentationAction.triggered.connect(universalFunction.handleDocsAction)
+        aboutAction.triggered.connect(universalFunction.handleAboutAction)
+
+        self.webView = None
+        self.toolButton.setMenu(self.context_menu)
+        self.toolButton.setPopupMode(QtWidgets.QToolButton.InstantPopup)
 
     def on_item_clicked(self, item):
         self.selected_item = item.text()
@@ -458,7 +486,7 @@ class Ui_modeOtomatis(object):
             self.midi_player_thread.terminate()
             self.midi_player_thread = None
         self.playButton.setEnabled(True)
-        self.pauseButton.setEnabled(False)
+        self.pauseButton.setEnabled(False) 
         self.pauseButton.setText('Pause')
         self.stopButton.setEnabled(False)
         print('player stopped')
@@ -482,8 +510,7 @@ class Ui_modeOtomatis(object):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self.mainMenu)
         self.mainMenu.showMaximized()
-        MainWindow.hide()
-        self.hideMidiOtomatis()
+        MainWindow.close()
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -496,10 +523,127 @@ class Ui_modeOtomatis(object):
         self.pauseButton.setText(_translate("MainWindow", "Pause"))
         self.stopButton.setText(_translate("MainWindow", "Stop"))
 
+class SettingsDialog(QtWidgets.QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setupUi()
+
+        self.closeButton.clicked.connect(self.close)
+
+    def setupUi(self):
+        self.setObjectName("Dialog")
+        self.resize(396, 265)
+        self.verticalLayout_3 = QtWidgets.QVBoxLayout(self)
+        self.verticalLayout_3.setObjectName("verticalLayout_3")
+        self.verticalLayout = QtWidgets.QVBoxLayout()
+        self.verticalLayout.setObjectName("verticalLayout")
+        self.titleName = QtWidgets.QLabel(self)
+        font = QtGui.QFont()
+        font.setPointSize(16)
+        font.setBold(True)
+        font.setWeight(75)
+        self.titleName.setFont(font)
+        self.titleName.setLayoutDirection(QtCore.Qt.LeftToRight)
+        self.titleName.setObjectName("titleName")
+        self.verticalLayout.addWidget(self.titleName, 0, QtCore.Qt.AlignHCenter|QtCore.Qt.AlignVCenter)
+        self.horizontalLayout = QtWidgets.QHBoxLayout()
+        self.horizontalLayout.setObjectName("horizontalLayout")
+        self.serialText = QtWidgets.QLabel(self)
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.serialText.setFont(font)
+        self.serialText.setObjectName("serialText")
+        self.horizontalLayout.addWidget(self.serialText)
+        self.statusSerial = QtWidgets.QLabel(self)
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.statusSerial.setFont(font)
+        self.statusSerial.setObjectName("statusSerial")
+        self.horizontalLayout.addWidget(self.statusSerial)
+        self.horizontalLayout_8 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_8.setObjectName("horizontalLayout_8")
+        self.horizontalLayout.addLayout(self.horizontalLayout_8)
+        self.reconnectSerial = QtWidgets.QPushButton(self)
+        self.reconnectSerial.setObjectName("reconnectSerial")
+        self.horizontalLayout.addWidget(self.reconnectSerial)
+        self.verticalLayout.addLayout(self.horizontalLayout)
+        self.horizontalLayout_5 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_5.setObjectName("horizontalLayout_5")
+        self.MIDItext = QtWidgets.QLabel(self)
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.MIDItext.setFont(font)
+        self.MIDItext.setObjectName("MIDItext")
+        self.horizontalLayout_5.addWidget(self.MIDItext)
+        self.statusMIDI = QtWidgets.QLabel(self)
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.statusMIDI.setFont(font)
+        self.statusMIDI.setObjectName("statusMIDI")
+        self.horizontalLayout_5.addWidget(self.statusMIDI)
+        self.horizontalLayout_9 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_9.setObjectName("horizontalLayout_9")
+        self.horizontalLayout_5.addLayout(self.horizontalLayout_9)
+        self.reconnectMIDI = QtWidgets.QPushButton(self)
+        self.reconnectMIDI.setObjectName("reconnectMIDI")
+        self.horizontalLayout_5.addWidget(self.reconnectMIDI)
+        self.verticalLayout.addLayout(self.horizontalLayout_5)
+        self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_2.setObjectName("horizontalLayout_2")
+        self.horizontalLayout_6 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_6.setObjectName("horizontalLayout_6")
+        self.horizontalLayout_2.addLayout(self.horizontalLayout_6)
+        self.horizontalLayout_7 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_7.setObjectName("horizontalLayout_7")
+        self.closeButton = QtWidgets.QPushButton(self)
+        self.closeButton.setObjectName("closeButton")
+        self.horizontalLayout_7.addWidget(self.closeButton)
+        self.horizontalLayout_2.addLayout(self.horizontalLayout_7)
+        self.horizontalLayout_4 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_4.setObjectName("horizontalLayout_4")
+        self.horizontalLayout_2.addLayout(self.horizontalLayout_4)
+        self.verticalLayout.addLayout(self.horizontalLayout_2)
+        self.verticalLayout_3.addLayout(self.verticalLayout)
+        
+        try:
+            ser = serial.Serial(serialPort)
+            if ser.is_open:
+                self.reconnectSerial.setEnabled(False)
+                self.statusSerial.setText('Connected')
+                ffe = False
+            else:
+                self.reconnectSerial.setEnabled(True)
+                self.statusSerial.setText('Disconnected')
+                print(f"Serial port {serialPort} is already closed")
+        except serial.SerialException as e:
+                self.reconnectSerial.setEnabled(True)
+                self.statusSerial.setText('Disconnected')
+                print(f"{serialPort}: {e}")
+        
+        sleep(0.01)
+        
+    def reconnectSerial(self):
+        ser = serialPort
+
+        self.retranslateUi()
+
+    def retranslateUi(self):
+        _translate = QtCore.QCoreApplication.translate
+        self.setWindowTitle(_translate("Dialog", "Dialog"))
+        self.titleName.setText(_translate("Dialog", "Connection Status"))
+        self.serialText.setText(_translate("Dialog", "Microcontroller: "))
+        self.statusSerial.setText(_translate("Dialog", " Connected"))
+        self.reconnectSerial.setText(_translate("Dialog", "Reconnect"))
+        self.MIDItext.setText(_translate("Dialog", "MIDI Controller: "))
+        self.statusMIDI.setText(_translate("Dialog", " Connected"))
+        self.reconnectMIDI.setText(_translate("Dialog", "Reconnect"))
+        self.closeButton.setText(_translate("Dialog", "Close"))
+
 class universalFunction:
     # settings object
     def handleSettingsAction(self):
-        print("Action 1 triggered")
+        settings_dialog = SettingsDialog()
+        settings_dialog.exec_()
     
     def handleDocsAction(self):
         url = QUrl("https://github.com/theopenhighway") 
@@ -512,7 +656,8 @@ class universalFunction:
         msg_box.setIcon(QMessageBox.Information)
         msg_box.exec_()
         # print("Action 3 triggered")
-    
+
+
 
 if __name__ == "__main__":
     import sys
