@@ -9,7 +9,10 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-
+from PyQt5.QtWidgets import QMessageBox
+from PyQt5.QtCore import QThread, pyqtSignal
+import serial
+from time import sleep
 
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
@@ -89,6 +92,28 @@ class Ui_Dialog(object):
 
         self.retranslateUi(Dialog)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
+
+        ffe = True
+        while ffe == True:
+            try:
+                ser = serial.Serial('COM3')
+                if ser.is_open:
+                    self.reconnectSerial.setEnabled(False)
+                    self.statusSerial.setText('Connected')
+                    ffe = False
+                else:
+                    self.reconnectSerial.setEnabled(True)
+                    self.statusSerial.setText('Disconnected')
+                    print(f"Serial port {'COM3'} is already closed")
+            except serial.SerialException as e:
+                    self.reconnectSerial.setEnabled(True)
+                    self.statusSerial.setText('Disconnected')
+                    print(f"{'COM3'}: {e}")
+            
+            sleep(0.01)
+        
+    def reconnectSerial(self):
+        ser = serial.Serial('COM3',31250, timeout=1)
 
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
