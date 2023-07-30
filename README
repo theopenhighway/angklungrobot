@@ -1,8 +1,13 @@
-# Hello There
+# Angklung Robot
 
 ## Overview
 
-This is a repository is based on my undergraduate thesis titled "bla bla". It is a system that allows the angklung (an Indonesian traditional musical instrument) to operate based on MIDI events.
+This is a repository is based on my undergraduate thesis titled "Perancangan Sistem Otomatisasi Alat Musik Angklung dengan Input Berformat MIDI" (translation: bsbsbbsbbs). It is a system that allows the angklung (an Indonesian traditional musical instrument) to operate based on MIDI events.
+
+There are two modes available on this system:
+
+- fdfdf
+- dfdf
 
 ## Requirements
 
@@ -19,9 +24,7 @@ This is a repository is based on my undergraduate thesis titled "bla bla". It is
 
 Install the following dependencies to
 
-'''
-pip install python-rtmidi
-'''
+``` pip install python-rtmidi ```
 
 ## Repository Organization
 
