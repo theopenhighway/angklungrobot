@@ -1,2 +1,32 @@
-This is a repository dedicated to an undergraduate thesis that I am currently working on. 
-Further details will be added in the near future.
+# Hello There
+
+## Overview
+
+This is a repository is based on my undergraduate thesis titled "bla bla". It is a system that allows the angklung (an Indonesian traditional musical instrument) to operate based on MIDI events.
+
+## Requirements
+
+- Python 3.9.2 or higher
+- Raspbian OS (with couple of modifications)
+
+## Technical Specification
+
+- Raspberry Pi 4B
+- Arduino Mega 2560
+- Relay Module
+
+## Dependencies
+
+Install the following dependencies to
+
+'''
+pip install python-rtmidi
+'''
+
+## Repository Organization
+
+sss
+
+## Limitation
+
+fffff
