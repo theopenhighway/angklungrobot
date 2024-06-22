@@ -2,7 +2,7 @@
 
 ## Overview
 
-This is a repository is based on my undergraduate thesis, titled "Perancangan Sistem Otomatisasi Alat Musik Angklung dengan Input Berformat MIDI" (translation: bsbsbbsbbs). It is a system that allows the angklung (an Indonesian traditional musical instrument) to operate based on MIDI events.
+This is a repository is based on my undergraduate thesis, titled "Perancangan Sistem Otomatisasi Alat Musik Angklung dengan Input Berformat MIDI" (translation: bsbsbbsbbs). It is a system that allows an angklung (Indonesian traditional musical instrument) to operate automatically based on MIDI events.
 
 There are two modes available on this system:
 
@@ -13,7 +13,7 @@ There are two modes available on this system:
 
 - Python 3.9.2 or higher
 - Raspbian OS
-- Windows 11 (with couple of modifications)
+
 
 ## Technical Specification
 
@@ -21,7 +21,7 @@ There are two modes available on this system:
 - Arduino Mega 2560
 - Relay Module
 - N20 Gearbox 1000 RPM DC Motor
-- bla bla
+- 25-Key MIDI Controller
 
 ## Dependencies
 
@@ -45,9 +45,9 @@ pip install python-rtmidi
 
 ## Repository Organization
 
-sss
 
-## Limitation
+
+## Limitation (Potential Further Development)
 
 - Lack of error handling management
-fffff
+- 
