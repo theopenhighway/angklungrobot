@@ -2,7 +2,7 @@
 
 ## Overview
 
-This is a repository is based on my undergraduate thesis, titled "Perancangan Sistem Otomatisasi Alat Musik Angklung dengan Input Berformat MIDI" (translation: Design of an Automated Angklung Musical Instrument System with MIDI Input). It is a system that allows an angklung (Indonesian traditional musical instrument) to operate automatically based on MIDI events.
+This is a repository based on my undergraduate thesis, titled "Perancangan Sistem Otomatisasi Alat Musik Angklung dengan Input Berformat MIDI" (translation: Design of an Automated Angklung Musical Instrument System with MIDI Input). It is a system that allows an angklung (Indonesian traditional musical instrument) to operate automatically based on MIDI events.
 
 There are two modes available on this system:
 
